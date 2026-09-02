@@ -12,5 +12,4 @@ RUN mvn -B package -DskipTests -Dquarkus.package.jar.type=fast-jar
 
 FROM eclipse-temurin:${JAVA_VERSION}-jre-alpine
 COPY --from=build /src/target/quarkus-app/ /app/
-EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/quarkus-run.jar"]

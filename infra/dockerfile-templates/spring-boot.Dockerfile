@@ -15,5 +15,4 @@ FROM eclipse-temurin:${JAVA_VERSION}-jre-alpine
 ARG OTEL_JAVAAGENT_VERSION
 ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/${OTEL_JAVAAGENT_VERSION}/opentelemetry-javaagent.jar /otel/opentelemetry-javaagent.jar
 COPY --from=build /src/target/*.jar /app/app.jar
-EXPOSE 8080
 ENTRYPOINT ["java", "-javaagent:/otel/opentelemetry-javaagent.jar", "-jar", "/app/app.jar"]

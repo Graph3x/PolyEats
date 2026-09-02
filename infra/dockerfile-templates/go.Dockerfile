@@ -1,6 +1,6 @@
 # Dockerfile template — Go services.
 
-ARG GO_VERSION=1.26.5
+ARG GO_VERSION=1.27.0
 
 FROM golang:${GO_VERSION}-alpine AS build
 WORKDIR /src
@@ -11,5 +11,4 @@ RUN CGO_ENABLED=0 go build -o /service ./cmd/service
 
 FROM gcr.io/distroless/static-debian13
 COPY --from=build /service /service
-EXPOSE 8080
 ENTRYPOINT ["/service"]

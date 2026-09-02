@@ -12,3 +12,11 @@ services:
       - "4318:4318"   # OTLP HTTP
     networks:
       - polyeats
+
+  geocoding:
+    build: ./services/geocoding
+    ports:
+      - "8080:8080" # REST
+      - "9090:9090" # gRPC
+    networks:
+      - polyeats
