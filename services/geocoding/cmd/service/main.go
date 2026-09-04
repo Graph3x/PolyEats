@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"net"
 	"net/http"
@@ -12,25 +11,24 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
-
-const defaultMessage = "hello from geocoding"
 
 type geocodingServer struct {
 	pb.UnimplementedGeocodingServer
 }
 
-func (s *geocodingServer) Hello(ctx context.Context, req *pb.HelloRequest) (*pb.HelloResponse, error) {
-	return &pb.HelloResponse{Message: defaultMessage}, nil
+func (s *geocodingServer) Geocode(ctx context.Context, req *pb.GeocodeRequest) (*pb.GeocodeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "geocode")
+}
+
+func (s *geocodingServer) ReverseGeocode(ctx context.Context, req *pb.ReverseGeocodeRequest) (*pb.ReverseGeocodeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "reverse geocode")
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-}
-
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"message": defaultMessage})
 }
 
 func main() {
@@ -56,7 +54,6 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", healthHandler)
-	mux.HandleFunc("/hello", helloHandler)
 	log.Println("http listening on :8080")
 	if err := http.ListenAndServe(":8080", otelhttp.NewHandler(mux, "geocoding")); err != nil {
 		log.Fatalf("http serve: %v", err)
