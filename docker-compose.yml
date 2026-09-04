@@ -3,6 +3,12 @@ name: polyeats
 networks:
   polyeats:
 
+x-otel: &otel
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+  OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+  OTEL_METRICS_EXPORTER: none
+  OTEL_LOGS_EXPORTER: none
+
 services:
   jaeger:
     image: jaegertracing/jaeger:2.20.0
@@ -15,6 +21,9 @@ services:
 
   geocoding:
     build: ./services/geocoding
+    environment:
+      <<: *otel
+      OTEL_SERVICE_NAME: geocoding
     ports:
       - "8080:8080" # REST
       - "9090:9090" # gRPC
@@ -24,6 +33,8 @@ services:
   order-tracking:
     build: ./services/order-tracking
     environment:
+      <<: *otel
+      OTEL_SERVICE_NAME: order-tracking
       GEOCODING_ADDR: geocoding:9090
     ports:
       - "8081:8080" # REST
@@ -33,6 +44,8 @@ services:
   address:
     build: ./services/address
     environment:
+      <<: *otel
+      OTEL_SERVICE_NAME: address
       GEOCODING_ADDR: geocoding:9090
     ports:
       - "8082:8080" # REST

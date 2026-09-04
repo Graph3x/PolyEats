@@ -9,6 +9,8 @@ import (
 
 	pb "geocoding/proto"
 
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"google.golang.org/grpc"
 )
 
@@ -28,12 +30,19 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	ctx := context.Background()
+	shutdown, err := initTracing(ctx)
+	if err != nil {
+		log.Fatalf("tracing: %v", err)
+	}
+	defer shutdown(ctx)
+
 	go func() {
 		lis, err := net.Listen("tcp", ":9090")
 		if err != nil {
 			log.Fatalf("grpc listen: %v", err)
 		}
-		s := grpc.NewServer()
+		s := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()))
 		pb.RegisterGeocodingServer(s, &geocodingServer{})
 		log.Println("grpc listening on :9090")
 		if err := s.Serve(lis); err != nil {
@@ -41,9 +50,10 @@ func main() {
 		}
 	}()
 
-	http.HandleFunc("/hello", helloHandler)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/hello", helloHandler)
 	log.Println("http listening on :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":8080", otelhttp.NewHandler(mux, "geocoding")); err != nil {
 		log.Fatalf("http serve: %v", err)
 	}
 }
