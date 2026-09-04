@@ -42,11 +42,33 @@ services:
     networks:
       - polyeats
 
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: address
+      POSTGRES_USER: polyeats
+      POSTGRES_PASSWORD: polyeats
+    volumes:
+      - ./services/address/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U polyeats -d address"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - polyeats
+
   address:
     build: ./services/address
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       <<: *otel
       OTEL_SERVICE_NAME: address
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/address
+      POSTGRES_USER: polyeats
+      POSTGRES_PASSWORD: polyeats
     ports:
       - "8082:8080" # REST
     networks:
