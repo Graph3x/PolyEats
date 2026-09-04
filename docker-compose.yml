@@ -24,6 +24,7 @@ services:
     environment:
       <<: *otel
       OTEL_SERVICE_NAME: geocoding
+      GEO_DB_PATH: /data/geo.db
     ports:
       - "8080:8080" # REST
       - "9090:9090" # gRPC
