@@ -1,16 +1,19 @@
 package com.polyeats.address;
 
+import com.polyeats.geocoding.GeocodingGrpc;
+import com.polyeats.geocoding.HelloRequest;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 class HelloController {
 
-    private final GeocodingClient geocoding;
+    private final GeocodingGrpc.GeocodingBlockingStub geocoding;
 
-    HelloController(GeocodingClient geocoding) {
-        this.geocoding = geocoding;
+    HelloController(GrpcChannels channels) {
+        this.geocoding = GeocodingGrpc.newBlockingStub(channels.create("geocoding:9090"));
     }
 
     @GetMapping("/hello")
@@ -20,6 +23,9 @@ class HelloController {
 
     @GetMapping("/hello/geocoding")
     Map<String, String> helloGeocoding() {
-        return Map.of("message", geocoding.hello());
+        String message = geocoding.withDeadlineAfter(5, TimeUnit.SECONDS)
+                .hello(HelloRequest.getDefaultInstance())
+                .getMessage();
+        return Map.of("message", message);
     }
 }
