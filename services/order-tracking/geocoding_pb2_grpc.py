@@ -34,17 +34,28 @@ class GeocodingStub:
         Args:
             channel: A grpc.Channel.
         """
-        self.Hello = channel.unary_unary(
-                '/geocoding.Geocoding/Hello',
-                request_serializer=geocoding__pb2.HelloRequest.SerializeToString,
-                response_deserializer=geocoding__pb2.HelloResponse.FromString,
+        self.Geocode = channel.unary_unary(
+                '/geocoding.Geocoding/Geocode',
+                request_serializer=geocoding__pb2.GeocodeRequest.SerializeToString,
+                response_deserializer=geocoding__pb2.GeocodeResponse.FromString,
+                _registered_method=True)
+        self.ReverseGeocode = channel.unary_unary(
+                '/geocoding.Geocoding/ReverseGeocode',
+                request_serializer=geocoding__pb2.ReverseGeocodeRequest.SerializeToString,
+                response_deserializer=geocoding__pb2.ReverseGeocodeResponse.FromString,
                 _registered_method=True)
 
 
 class GeocodingServicer:
     """Missing associated documentation comment in .proto file."""
 
-    def Hello(self, request, context):
+    def Geocode(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ReverseGeocode(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -53,10 +64,15 @@ class GeocodingServicer:
 
 def add_GeocodingServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'Hello': grpc.unary_unary_rpc_method_handler(
-                    servicer.Hello,
-                    request_deserializer=geocoding__pb2.HelloRequest.FromString,
-                    response_serializer=geocoding__pb2.HelloResponse.SerializeToString,
+            'Geocode': grpc.unary_unary_rpc_method_handler(
+                    servicer.Geocode,
+                    request_deserializer=geocoding__pb2.GeocodeRequest.FromString,
+                    response_serializer=geocoding__pb2.GeocodeResponse.SerializeToString,
+            ),
+            'ReverseGeocode': grpc.unary_unary_rpc_method_handler(
+                    servicer.ReverseGeocode,
+                    request_deserializer=geocoding__pb2.ReverseGeocodeRequest.FromString,
+                    response_serializer=geocoding__pb2.ReverseGeocodeResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -70,7 +86,7 @@ class Geocoding:
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def Hello(request,
+    def Geocode(request,
             target,
             options=(),
             channel_credentials=None,
@@ -83,9 +99,36 @@ class Geocoding:
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/geocoding.Geocoding/Hello',
-            geocoding__pb2.HelloRequest.SerializeToString,
-            geocoding__pb2.HelloResponse.FromString,
+            '/geocoding.Geocoding/Geocode',
+            geocoding__pb2.GeocodeRequest.SerializeToString,
+            geocoding__pb2.GeocodeResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ReverseGeocode(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/geocoding.Geocoding/ReverseGeocode',
+            geocoding__pb2.ReverseGeocodeRequest.SerializeToString,
+            geocoding__pb2.ReverseGeocodeResponse.FromString,
             options,
             channel_credentials,
             insecure,

@@ -21,26 +21,30 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type HelloRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+type Address struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Street         string                 `protobuf:"bytes,1,opt,name=street,proto3" json:"street,omitempty"`
+	BuildingNumber string                 `protobuf:"bytes,2,opt,name=building_number,json=buildingNumber,proto3" json:"building_number,omitempty"`
+	City           string                 `protobuf:"bytes,3,opt,name=city,proto3" json:"city,omitempty"`
+	PostalCode     string                 `protobuf:"bytes,4,opt,name=postal_code,json=postalCode,proto3" json:"postal_code,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
-func (x *HelloRequest) Reset() {
-	*x = HelloRequest{}
+func (x *Address) Reset() {
+	*x = Address{}
 	mi := &file_proto_geocoding_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *HelloRequest) String() string {
+func (x *Address) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*HelloRequest) ProtoMessage() {}
+func (*Address) ProtoMessage() {}
 
-func (x *HelloRequest) ProtoReflect() protoreflect.Message {
+func (x *Address) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_geocoding_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -52,32 +56,61 @@ func (x *HelloRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use HelloRequest.ProtoReflect.Descriptor instead.
-func (*HelloRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use Address.ProtoReflect.Descriptor instead.
+func (*Address) Descriptor() ([]byte, []int) {
 	return file_proto_geocoding_proto_rawDescGZIP(), []int{0}
 }
 
-type HelloResponse struct {
+func (x *Address) GetStreet() string {
+	if x != nil {
+		return x.Street
+	}
+	return ""
+}
+
+func (x *Address) GetBuildingNumber() string {
+	if x != nil {
+		return x.BuildingNumber
+	}
+	return ""
+}
+
+func (x *Address) GetCity() string {
+	if x != nil {
+		return x.City
+	}
+	return ""
+}
+
+func (x *Address) GetPostalCode() string {
+	if x != nil {
+		return x.PostalCode
+	}
+	return ""
+}
+
+type Coordinates struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Lat           float64                `protobuf:"fixed64,1,opt,name=lat,proto3" json:"lat,omitempty"`
+	Lon           float64                `protobuf:"fixed64,2,opt,name=lon,proto3" json:"lon,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *HelloResponse) Reset() {
-	*x = HelloResponse{}
+func (x *Coordinates) Reset() {
+	*x = Coordinates{}
 	mi := &file_proto_geocoding_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *HelloResponse) String() string {
+func (x *Coordinates) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*HelloResponse) ProtoMessage() {}
+func (*Coordinates) ProtoMessage() {}
 
-func (x *HelloResponse) ProtoReflect() protoreflect.Message {
+func (x *Coordinates) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_geocoding_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -89,28 +122,227 @@ func (x *HelloResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use HelloResponse.ProtoReflect.Descriptor instead.
-func (*HelloResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use Coordinates.ProtoReflect.Descriptor instead.
+func (*Coordinates) Descriptor() ([]byte, []int) {
 	return file_proto_geocoding_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *HelloResponse) GetMessage() string {
+func (x *Coordinates) GetLat() float64 {
 	if x != nil {
-		return x.Message
+		return x.Lat
 	}
-	return ""
+	return 0
+}
+
+func (x *Coordinates) GetLon() float64 {
+	if x != nil {
+		return x.Lon
+	}
+	return 0
+}
+
+type GeocodeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Address       *Address               `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GeocodeRequest) Reset() {
+	*x = GeocodeRequest{}
+	mi := &file_proto_geocoding_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GeocodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GeocodeRequest) ProtoMessage() {}
+
+func (x *GeocodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_geocoding_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GeocodeRequest.ProtoReflect.Descriptor instead.
+func (*GeocodeRequest) Descriptor() ([]byte, []int) {
+	return file_proto_geocoding_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GeocodeRequest) GetAddress() *Address {
+	if x != nil {
+		return x.Address
+	}
+	return nil
+}
+
+type GeocodeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Coordinates   *Coordinates           `protobuf:"bytes,1,opt,name=coordinates,proto3" json:"coordinates,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GeocodeResponse) Reset() {
+	*x = GeocodeResponse{}
+	mi := &file_proto_geocoding_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GeocodeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GeocodeResponse) ProtoMessage() {}
+
+func (x *GeocodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_geocoding_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GeocodeResponse.ProtoReflect.Descriptor instead.
+func (*GeocodeResponse) Descriptor() ([]byte, []int) {
+	return file_proto_geocoding_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GeocodeResponse) GetCoordinates() *Coordinates {
+	if x != nil {
+		return x.Coordinates
+	}
+	return nil
+}
+
+type ReverseGeocodeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Coordinates   *Coordinates           `protobuf:"bytes,1,opt,name=coordinates,proto3" json:"coordinates,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReverseGeocodeRequest) Reset() {
+	*x = ReverseGeocodeRequest{}
+	mi := &file_proto_geocoding_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReverseGeocodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReverseGeocodeRequest) ProtoMessage() {}
+
+func (x *ReverseGeocodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_geocoding_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReverseGeocodeRequest.ProtoReflect.Descriptor instead.
+func (*ReverseGeocodeRequest) Descriptor() ([]byte, []int) {
+	return file_proto_geocoding_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ReverseGeocodeRequest) GetCoordinates() *Coordinates {
+	if x != nil {
+		return x.Coordinates
+	}
+	return nil
+}
+
+type ReverseGeocodeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Address       *Address               `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReverseGeocodeResponse) Reset() {
+	*x = ReverseGeocodeResponse{}
+	mi := &file_proto_geocoding_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReverseGeocodeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReverseGeocodeResponse) ProtoMessage() {}
+
+func (x *ReverseGeocodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_geocoding_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReverseGeocodeResponse.ProtoReflect.Descriptor instead.
+func (*ReverseGeocodeResponse) Descriptor() ([]byte, []int) {
+	return file_proto_geocoding_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ReverseGeocodeResponse) GetAddress() *Address {
+	if x != nil {
+		return x.Address
+	}
+	return nil
 }
 
 var File_proto_geocoding_proto protoreflect.FileDescriptor
 
 const file_proto_geocoding_proto_rawDesc = "" +
 	"\n" +
-	"\x15proto/geocoding.proto\x12\tgeocoding\"\x0e\n" +
-	"\fHelloRequest\")\n" +
-	"\rHelloResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage2G\n" +
-	"\tGeocoding\x12:\n" +
-	"\x05Hello\x12\x17.geocoding.HelloRequest\x1a\x18.geocoding.HelloResponseB\x11Z\x0fgeocoding/protob\x06proto3"
+	"\x15proto/geocoding.proto\x12\tgeocoding\"\x7f\n" +
+	"\aAddress\x12\x16\n" +
+	"\x06street\x18\x01 \x01(\tR\x06street\x12'\n" +
+	"\x0fbuilding_number\x18\x02 \x01(\tR\x0ebuildingNumber\x12\x12\n" +
+	"\x04city\x18\x03 \x01(\tR\x04city\x12\x1f\n" +
+	"\vpostal_code\x18\x04 \x01(\tR\n" +
+	"postalCode\"1\n" +
+	"\vCoordinates\x12\x10\n" +
+	"\x03lat\x18\x01 \x01(\x01R\x03lat\x12\x10\n" +
+	"\x03lon\x18\x02 \x01(\x01R\x03lon\">\n" +
+	"\x0eGeocodeRequest\x12,\n" +
+	"\aaddress\x18\x01 \x01(\v2\x12.geocoding.AddressR\aaddress\"K\n" +
+	"\x0fGeocodeResponse\x128\n" +
+	"\vcoordinates\x18\x01 \x01(\v2\x16.geocoding.CoordinatesR\vcoordinates\"Q\n" +
+	"\x15ReverseGeocodeRequest\x128\n" +
+	"\vcoordinates\x18\x01 \x01(\v2\x16.geocoding.CoordinatesR\vcoordinates\"F\n" +
+	"\x16ReverseGeocodeResponse\x12,\n" +
+	"\aaddress\x18\x01 \x01(\v2\x12.geocoding.AddressR\aaddress2\xa4\x01\n" +
+	"\tGeocoding\x12@\n" +
+	"\aGeocode\x12\x19.geocoding.GeocodeRequest\x1a\x1a.geocoding.GeocodeResponse\x12U\n" +
+	"\x0eReverseGeocode\x12 .geocoding.ReverseGeocodeRequest\x1a!.geocoding.ReverseGeocodeResponseB+\n" +
+	"\x16com.polyeats.geocodingP\x01Z\x0fgeocoding/protob\x06proto3"
 
 var (
 	file_proto_geocoding_proto_rawDescOnce sync.Once
@@ -124,19 +356,29 @@ func file_proto_geocoding_proto_rawDescGZIP() []byte {
 	return file_proto_geocoding_proto_rawDescData
 }
 
-var file_proto_geocoding_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_proto_geocoding_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_proto_geocoding_proto_goTypes = []any{
-	(*HelloRequest)(nil),  // 0: geocoding.HelloRequest
-	(*HelloResponse)(nil), // 1: geocoding.HelloResponse
+	(*Address)(nil),                // 0: geocoding.Address
+	(*Coordinates)(nil),            // 1: geocoding.Coordinates
+	(*GeocodeRequest)(nil),         // 2: geocoding.GeocodeRequest
+	(*GeocodeResponse)(nil),        // 3: geocoding.GeocodeResponse
+	(*ReverseGeocodeRequest)(nil),  // 4: geocoding.ReverseGeocodeRequest
+	(*ReverseGeocodeResponse)(nil), // 5: geocoding.ReverseGeocodeResponse
 }
 var file_proto_geocoding_proto_depIdxs = []int32{
-	0, // 0: geocoding.Geocoding.Hello:input_type -> geocoding.HelloRequest
-	1, // 1: geocoding.Geocoding.Hello:output_type -> geocoding.HelloResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: geocoding.GeocodeRequest.address:type_name -> geocoding.Address
+	1, // 1: geocoding.GeocodeResponse.coordinates:type_name -> geocoding.Coordinates
+	1, // 2: geocoding.ReverseGeocodeRequest.coordinates:type_name -> geocoding.Coordinates
+	0, // 3: geocoding.ReverseGeocodeResponse.address:type_name -> geocoding.Address
+	2, // 4: geocoding.Geocoding.Geocode:input_type -> geocoding.GeocodeRequest
+	4, // 5: geocoding.Geocoding.ReverseGeocode:input_type -> geocoding.ReverseGeocodeRequest
+	3, // 6: geocoding.Geocoding.Geocode:output_type -> geocoding.GeocodeResponse
+	5, // 7: geocoding.Geocoding.ReverseGeocode:output_type -> geocoding.ReverseGeocodeResponse
+	6, // [6:8] is the sub-list for method output_type
+	4, // [4:6] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_proto_geocoding_proto_init() }
@@ -150,7 +392,7 @@ func file_proto_geocoding_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_geocoding_proto_rawDesc), len(file_proto_geocoding_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

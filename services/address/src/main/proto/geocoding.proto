@@ -7,11 +7,34 @@ option java_package = "com.polyeats.geocoding";
 option java_multiple_files = true;
 
 service Geocoding {
-  rpc Hello(HelloRequest) returns (HelloResponse);
+  rpc Geocode(GeocodeRequest) returns (GeocodeResponse);
+  rpc ReverseGeocode(ReverseGeocodeRequest) returns (ReverseGeocodeResponse);
 }
 
-message HelloRequest {}
+message Address {
+  string street = 1;
+  string building_number = 2;
+  string city = 3;
+  string postal_code = 4;
+}
 
-message HelloResponse {
-  string message = 1;
+message Coordinates {
+  double lat = 1;
+  double lon = 2;
+}
+
+message GeocodeRequest {
+  Address address = 1;
+}
+
+message GeocodeResponse {
+  Coordinates coordinates = 1;
+}
+
+message ReverseGeocodeRequest {
+  Coordinates coordinates = 1;
+}
+
+message ReverseGeocodeResponse {
+  Address address = 1;
 }

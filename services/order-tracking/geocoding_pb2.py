@@ -24,18 +24,26 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fgeocoding.proto\x12\tgeocoding\"\x0e\n\x0cHelloRequest\" \n\rHelloResponse\x12\x0f\n\x07message\x18\x01 \x01(\t2G\n\tGeocoding\x12:\n\x05Hello\x12\x17.geocoding.HelloRequest\x1a\x18.geocoding.HelloResponseB\x11Z\x0fgeocoding/protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fgeocoding.proto\x12\tgeocoding\"U\n\x07\x41\x64\x64ress\x12\x0e\n\x06street\x18\x01 \x01(\t\x12\x17\n\x0f\x62uilding_number\x18\x02 \x01(\t\x12\x0c\n\x04\x63ity\x18\x03 \x01(\t\x12\x13\n\x0bpostal_code\x18\x04 \x01(\t\"\'\n\x0b\x43oordinates\x12\x0b\n\x03lat\x18\x01 \x01(\x01\x12\x0b\n\x03lon\x18\x02 \x01(\x01\"5\n\x0eGeocodeRequest\x12#\n\x07\x61\x64\x64ress\x18\x01 \x01(\x0b\x32\x12.geocoding.Address\">\n\x0fGeocodeResponse\x12+\n\x0b\x63oordinates\x18\x01 \x01(\x0b\x32\x16.geocoding.Coordinates\"D\n\x15ReverseGeocodeRequest\x12+\n\x0b\x63oordinates\x18\x01 \x01(\x0b\x32\x16.geocoding.Coordinates\"=\n\x16ReverseGeocodeResponse\x12#\n\x07\x61\x64\x64ress\x18\x01 \x01(\x0b\x32\x12.geocoding.Address2\xa4\x01\n\tGeocoding\x12@\n\x07Geocode\x12\x19.geocoding.GeocodeRequest\x1a\x1a.geocoding.GeocodeResponse\x12U\n\x0eReverseGeocode\x12 .geocoding.ReverseGeocodeRequest\x1a!.geocoding.ReverseGeocodeResponseB+\n\x16\x63om.polyeats.geocodingP\x01Z\x0fgeocoding/protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'geocoding_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
-  _globals['DESCRIPTOR']._serialized_options = b'Z\017geocoding/proto'
-  _globals['_HELLOREQUEST']._serialized_start=30
-  _globals['_HELLOREQUEST']._serialized_end=44
-  _globals['_HELLORESPONSE']._serialized_start=46
-  _globals['_HELLORESPONSE']._serialized_end=78
-  _globals['_GEOCODING']._serialized_start=80
-  _globals['_GEOCODING']._serialized_end=151
+  _globals['DESCRIPTOR']._serialized_options = b'\n\026com.polyeats.geocodingP\001Z\017geocoding/proto'
+  _globals['_ADDRESS']._serialized_start=30
+  _globals['_ADDRESS']._serialized_end=115
+  _globals['_COORDINATES']._serialized_start=117
+  _globals['_COORDINATES']._serialized_end=156
+  _globals['_GEOCODEREQUEST']._serialized_start=158
+  _globals['_GEOCODEREQUEST']._serialized_end=211
+  _globals['_GEOCODERESPONSE']._serialized_start=213
+  _globals['_GEOCODERESPONSE']._serialized_end=275
+  _globals['_REVERSEGEOCODEREQUEST']._serialized_start=277
+  _globals['_REVERSEGEOCODEREQUEST']._serialized_end=345
+  _globals['_REVERSEGEOCODERESPONSE']._serialized_start=347
+  _globals['_REVERSEGEOCODERESPONSE']._serialized_end=408
+  _globals['_GEOCODING']._serialized_start=411
+  _globals['_GEOCODING']._serialized_end=575
 # @@protoc_insertion_point(module_scope)

@@ -19,14 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Geocoding_Hello_FullMethodName = "/geocoding.Geocoding/Hello"
+	Geocoding_Geocode_FullMethodName        = "/geocoding.Geocoding/Geocode"
+	Geocoding_ReverseGeocode_FullMethodName = "/geocoding.Geocoding/ReverseGeocode"
 )
 
 // GeocodingClient is the client API for Geocoding service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GeocodingClient interface {
-	Hello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error)
+	Geocode(ctx context.Context, in *GeocodeRequest, opts ...grpc.CallOption) (*GeocodeResponse, error)
+	ReverseGeocode(ctx context.Context, in *ReverseGeocodeRequest, opts ...grpc.CallOption) (*ReverseGeocodeResponse, error)
 }
 
 type geocodingClient struct {
@@ -37,10 +39,20 @@ func NewGeocodingClient(cc grpc.ClientConnInterface) GeocodingClient {
 	return &geocodingClient{cc}
 }
 
-func (c *geocodingClient) Hello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error) {
+func (c *geocodingClient) Geocode(ctx context.Context, in *GeocodeRequest, opts ...grpc.CallOption) (*GeocodeResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(HelloResponse)
-	err := c.cc.Invoke(ctx, Geocoding_Hello_FullMethodName, in, out, cOpts...)
+	out := new(GeocodeResponse)
+	err := c.cc.Invoke(ctx, Geocoding_Geocode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *geocodingClient) ReverseGeocode(ctx context.Context, in *ReverseGeocodeRequest, opts ...grpc.CallOption) (*ReverseGeocodeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ReverseGeocodeResponse)
+	err := c.cc.Invoke(ctx, Geocoding_ReverseGeocode_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +63,8 @@ func (c *geocodingClient) Hello(ctx context.Context, in *HelloRequest, opts ...g
 // All implementations must embed UnimplementedGeocodingServer
 // for forward compatibility.
 type GeocodingServer interface {
-	Hello(context.Context, *HelloRequest) (*HelloResponse, error)
+	Geocode(context.Context, *GeocodeRequest) (*GeocodeResponse, error)
+	ReverseGeocode(context.Context, *ReverseGeocodeRequest) (*ReverseGeocodeResponse, error)
 	mustEmbedUnimplementedGeocodingServer()
 }
 
@@ -62,8 +75,11 @@ type GeocodingServer interface {
 // pointer dereference when methods are called.
 type UnimplementedGeocodingServer struct{}
 
-func (UnimplementedGeocodingServer) Hello(context.Context, *HelloRequest) (*HelloResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method Hello not implemented")
+func (UnimplementedGeocodingServer) Geocode(context.Context, *GeocodeRequest) (*GeocodeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Geocode not implemented")
+}
+func (UnimplementedGeocodingServer) ReverseGeocode(context.Context, *ReverseGeocodeRequest) (*ReverseGeocodeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ReverseGeocode not implemented")
 }
 func (UnimplementedGeocodingServer) mustEmbedUnimplementedGeocodingServer() {}
 func (UnimplementedGeocodingServer) testEmbeddedByValue()                   {}
@@ -86,20 +102,38 @@ func RegisterGeocodingServer(s grpc.ServiceRegistrar, srv GeocodingServer) {
 	s.RegisterService(&Geocoding_ServiceDesc, srv)
 }
 
-func _Geocoding_Hello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloRequest)
+func _Geocoding_Geocode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GeocodeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GeocodingServer).Hello(ctx, in)
+		return srv.(GeocodingServer).Geocode(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Geocoding_Hello_FullMethodName,
+		FullMethod: Geocoding_Geocode_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GeocodingServer).Hello(ctx, req.(*HelloRequest))
+		return srv.(GeocodingServer).Geocode(ctx, req.(*GeocodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Geocoding_ReverseGeocode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReverseGeocodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GeocodingServer).ReverseGeocode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Geocoding_ReverseGeocode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GeocodingServer).ReverseGeocode(ctx, req.(*ReverseGeocodeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -112,8 +146,12 @@ var Geocoding_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GeocodingServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Hello",
-			Handler:    _Geocoding_Hello_Handler,
+			MethodName: "Geocode",
+			Handler:    _Geocoding_Geocode_Handler,
+		},
+		{
+			MethodName: "ReverseGeocode",
+			Handler:    _Geocoding_ReverseGeocode_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
