@@ -16,6 +16,10 @@ class HelloController {
         this.geocoding = GeocodingGrpc.newBlockingStub(channels.create("geocoding:9090"));
     }
 
+    @GetMapping("/health")
+    void health() {
+    }
+
     @GetMapping("/hello")
     Map<String, String> hello() {
         return Map.of("message", "hello from address");

@@ -24,6 +24,10 @@ func (s *geocodingServer) Hello(ctx context.Context, req *pb.HelloRequest) (*pb.
 	return &pb.HelloResponse{Message: defaultMessage}, nil
 }
 
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}
+
 func helloHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"message": defaultMessage})
@@ -51,6 +55,7 @@ func main() {
 	}()
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("/health", healthHandler)
 	mux.HandleFunc("/hello", helloHandler)
 	log.Println("http listening on :8080")
 	if err := http.ListenAndServe(":8080", otelhttp.NewHandler(mux, "geocoding")); err != nil {

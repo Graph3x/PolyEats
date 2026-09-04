@@ -1,8 +1,13 @@
 import uvicorn
 from clients import geocoding
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 
 app = FastAPI()
+
+
+@app.get("/health")
+def health():
+    return Response(status_code=200)
 
 
 @app.get("/hello")
