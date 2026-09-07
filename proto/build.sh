@@ -12,7 +12,7 @@ protoc -I . \
   proto/geocoding.proto
 
 echo "order-tracking (python)"
-.venv/bin/python -m grpc_tools.protoc -I proto \
+python -m grpc_tools.protoc -I proto \
   --python_out=services/order-tracking \
   --pyi_out=services/order-tracking \
   --grpc_python_out=services/order-tracking \
