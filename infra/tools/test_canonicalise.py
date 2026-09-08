@@ -28,13 +28,22 @@ def document(nodes=None, edges=None):
         "source": None,
         "license": "CC-BY-4.0",
         "doi": None,
-        "nodes": nodes if nodes is not None else [
+        "nodes": nodes
+        if nodes is not None
+        else [
             node(id="svc", kind="service", language="go", stack="grpc-go"),
             node(id="db:store", kind="datastore", stack="sqlite-ro"),
         ],
-        "edges": edges if edges is not None else [
-            edge(caller="svc", caller_endpoint="Svc/Get",
-                 callee="db:store", callee_endpoint="rows", type="query"),
+        "edges": edges
+        if edges is not None
+        else [
+            edge(
+                caller="svc",
+                caller_endpoint="Svc/Get",
+                callee="db:store",
+                callee_endpoint="rows",
+                type="query",
+            ),
         ],
     }
 
@@ -56,15 +65,21 @@ def test_hash_matches_independently_computed_digest():
 def test_absent_field_equals_explicit_null():
     formatter = Formatter({})
     sparse = {"caller_endpoint": "GET /x"}
-    explicit = {"caller_endpoint": "GET /x", "routing_key": None,
-                "headers": None, "selector": None, "role": None}
+    explicit = {
+        "caller_endpoint": "GET /x",
+        "routing_key": None,
+        "headers": None,
+        "selector": None,
+        "role": None,
+    }
     assert formatter.hash6(sparse) == formatter.hash6(explicit)
 
 
 def test_only_selector_expression_participates():
     formatter = Formatter({})
-    pattern = {"selector": {"type": "pattern", "syntax": "amqp-topic",
-                            "expression": "order.*"}}
+    pattern = {
+        "selector": {"type": "pattern", "syntax": "amqp-topic", "expression": "order.*"}
+    }
     exact = {"selector": {"type": "exact", "expression": "order.*"}}
     assert formatter.hash6(pattern) == formatter.hash6(exact)
     assert formatter.hash6(pattern) != formatter.hash6({})
@@ -77,8 +92,10 @@ def test_edge_id_is_caller_callee_hash():
 
 
 def test_serialise_orders_keys_sorts_nodes_and_ends_with_newline():
-    data = document(nodes=[node(id="zeta", kind="service"),
-                           node(id="alpha", kind="service")], edges=[])
+    data = document(
+        nodes=[node(id="zeta", kind="service"), node(id="alpha", kind="service")],
+        edges=[],
+    )
     output = Formatter(data).serialise()
     parsed = json.loads(output)
 
@@ -102,17 +119,26 @@ def test_minimal_document_is_valid():
     assert errors_for(document()) == ""
 
 
-@pytest.mark.parametrize("mutate, expected", [
-    (lambda d: d["edges"][0].update(callee="ghost"), "is not a declared node"),
-    (lambda d: d["nodes"].append(dict(d["nodes"][0])), "duplicate id"),
-    (lambda d: d["nodes"][0].update(language="rust"), "not one of"),
-    (lambda d: d["edges"][0].update(callee="svc"), "must end at a datastore"),
-    (lambda d: d["edges"][0].update(pattern=["literal-url"]), "'pattern' only applies to"),
-    (lambda d: d["edges"][0].update(static=False), "at least one of"),
-    (lambda d: d["edges"][0].update(derived_from=["nope"]), "only applies to 'async-derived'"),
-    (lambda d: d.update(nodes=None), "must both be arrays"),
-    (lambda d: d.pop("license"), "missing 'license'"),
-])
+@pytest.mark.parametrize(
+    "mutate, expected",
+    [
+        (lambda d: d["edges"][0].update(callee="ghost"), "is not a declared node"),
+        (lambda d: d["nodes"].append(dict(d["nodes"][0])), "duplicate id"),
+        (lambda d: d["nodes"][0].update(language="rust"), "not one of"),
+        (lambda d: d["edges"][0].update(callee="svc"), "must end at a datastore"),
+        (
+            lambda d: d["edges"][0].update(pattern=["literal-url"]),
+            "'pattern' only applies to",
+        ),
+        (lambda d: d["edges"][0].update(static=False), "at least one of"),
+        (
+            lambda d: d["edges"][0].update(derived_from=["nope"]),
+            "only applies to 'async-derived'",
+        ),
+        (lambda d: d.update(nodes=None), "must both be arrays"),
+        (lambda d: d.pop("license"), "missing 'license'"),
+    ],
+)
 def test_validation_rule_fires(mutate, expected):
     data = document()
     mutate(data)

@@ -1,2 +1,4 @@
 pytest
 grpcio-tools
+ruff
+mypy
