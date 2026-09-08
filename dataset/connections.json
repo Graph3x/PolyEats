@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "dataset_version": null,
   "timestamp": null,
   "source": null,
@@ -29,7 +29,7 @@
       "delivery": null
     },
     {
-      "id": "db:geo",
+      "id": "db:geocoding",
       "kind": "datastore",
       "language": null,
       "stack": "sqlite-ro",
@@ -180,10 +180,10 @@
       "observed": false
     },
     {
-      "id": "geocoding.db:geo.9f4a45",
+      "id": "geocoding.db:geocoding.9f4a45",
       "caller": "geocoding",
       "caller_endpoint": "Geocoding/ReverseGeocode",
-      "callee": "db:geo",
+      "callee": "db:geocoding",
       "callee_endpoint": "addresses",
       "type": "query",
       "pattern": null,
@@ -196,10 +196,10 @@
       "observed": false
     },
     {
-      "id": "geocoding.db:geo.aa42b0",
+      "id": "geocoding.db:geocoding.aa42b0",
       "caller": "geocoding",
       "caller_endpoint": "Geocoding/Geocode",
-      "callee": "db:geo",
+      "callee": "db:geocoding",
       "callee_endpoint": "addresses",
       "type": "query",
       "pattern": null,

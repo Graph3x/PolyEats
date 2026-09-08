@@ -1,4 +1,4 @@
-# PolyEats - dataset schema
+# PolyEats - dataset schema version 1.1.0
 
 Specification for the published dataset: file layout, node/edge schema, enums, and serialization rules.
 
@@ -19,11 +19,11 @@ Specification for the published dataset: file layout, node/edge schema, enums, a
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `schema_version` | string | yes | semver of this schema |
-| `dataset_version` | string | yes | semver of this release |
-| `timestamp` | iso timestamp (utc) | yes | |
-| `source` | object | yes | `{repo, commit}` |
+| `dataset_version` | string | yes (on release) | semver of this release |
+| `timestamp` | iso timestamp (utc) | yes (on release) | |
+| `source` | object | yes (on release) | `{repo, commit}` |
 | `license` | string | yes | SPDX id — `CC-BY-4.0`. Covers this dataset, not the benchmark code |
-| `doi` | string | yes | Reserved on Zenodo *before* the release is generated, so the frozen artifact is self-describing |
+| `doi` | string | yes (on release) | Reserved on Zenodo *before* the release is generated, so the frozen artifact is self-describing |
 | `nodes` | array | yes | |
 | `edges` | array | yes | |
 
@@ -31,10 +31,7 @@ Specification for the published dataset: file layout, node/edge schema, enums, a
 
 ## Interpretation
 
-**Async span topology: links.** Consumers link to the producer's publish span
-rather than inheriting its trace; async edges are recovered from span
-attributes, not from link traversal. See B2 in
-[event-contract.md](event-contract.md).
+**Async span topology: links.** Consumers link to the producer's publish span rather than inheriting its trace; async edges are recovered from span attributes, not from link traversal.
 
 **Instance normalization.** Replica identity is stripped from traces, a node is a service, never one instance of it.
 
@@ -180,8 +177,7 @@ selector.syntax  amqp-topic · mqtt · nats · regex · sql-92 · json-filter
 selector.match   all · any                          (headers only)
 ```
 
-`expression` is always a string. Key-value forms are written as `k=v` pairs
-sorted by key and joined by `,`, so they stay hashable for edge ids.
+`expression` is always a string. Key-value forms are written as `k=v` pairs sorted by key and joined by `,`, so they stay hashable for edge ids.
 
 This is mostly generalization readiness and primarily internal only, SAR tools are expected to emit only the async-derived edges. This benchmark is using a very small subset of the options above.
 
@@ -189,10 +185,7 @@ This is mostly generalization readiness and primarily internal only, SAR tools a
 
 ## Operation naming
 
-Both `caller_endpoint` and `callee_endpoint` use these forms, so an edge's
-`callee_endpoint` matches the next edge's `caller_endpoint` by string equality.
-`query` edges are the exception: their `callee_endpoint` is a
-table or collection name, not an operation.
+Both `caller_endpoint` and `callee_endpoint` use these forms, so an edge's `callee_endpoint` matches the next edge's `caller_endpoint` by string equality. `query` edges are the exception: their `callee_endpoint` is a table or collection name, not an operation.
 
 | Origin | Form |
 |---|---|
@@ -201,14 +194,10 @@ table or collection name, not an operation.
 | WebSocket handler | `WS /telemetry` |
 | Broker consumer | `on:order.placed` |
 
-Path parameters use **named braces** — `GET /orders/{id}`. The name is part of
-the stored string, and therefore of the edge-id hash, so each endpoint has
-exactly one spelling: use the callee's own parameter name. Query strings and
-fragments are excluded — they are not part of endpoint identity. gRPC forms have
+Path parameters use **named braces** — `GET /orders/{id}`. The name is part of the stored string, and therefore of the edge-id hash, so each endpoint has exactly one spelling: use the callee's own parameter name. Query strings and fragments are excluded — they are not part of endpoint identity. gRPC forms have
 no parameters.
 
-Collapsing `{id}` to a placeholder is a matching concern and belongs to the
-scorer, not to this artifact.
+Collapsing `{id}` to a placeholder is a matching concern and belongs to the scorer, not to this artifact.
 
 ---
 
@@ -223,6 +212,4 @@ scorer, not to this artifact.
 
 ## SDG
 
-The dataset is the source of truth; the SDG is a view over it. To derive one,
-collapse all edges that share the same `caller` and `callee` into a single
-edge between those two nodes.
+The dataset is the source of truth; the SDG is a view over it. To derive one, collapse all edges that share the same `caller` and `callee` into a single edge between those two nodes.
