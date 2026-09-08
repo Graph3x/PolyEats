@@ -26,8 +26,8 @@ services:
       OTEL_SERVICE_NAME: geocoding
       GEO_DB_PATH: /data/geo.db
     ports:
-      - "8080:8080" # REST
-      - "9090:9090" # gRPC
+      - "8000:8080" # REST
+      - "9000:9090" # gRPC
     networks:
       - polyeats
 
@@ -38,7 +38,7 @@ services:
       OTEL_SERVICE_NAME: order-tracking
       GEOCODING_ADDR: geocoding:9090
     ports:
-      - "8081:8080" # REST
+      - "8001:8080" # REST
     networks:
       - polyeats
 
@@ -70,6 +70,6 @@ services:
       POSTGRES_USER: polyeats
       POSTGRES_PASSWORD: polyeats
     ports:
-      - "8082:8080" # REST
+      - "8002:8080" # REST
     networks:
       - polyeats
