@@ -22,7 +22,7 @@ Specification for the published dataset: file layout, node/edge schema, enums, a
 | `dataset_version` | string | yes (on release) | semver of this release |
 | `timestamp` | iso timestamp (utc) | yes (on release) | |
 | `source` | object | yes (on release) | `{repo, commit}` |
-| `license` | string | yes | SPDX id — `CC-BY-4.0`. Covers this dataset, not the benchmark code |
+| `license` | string | yes | SPDX id — `Apache-2.0` |
 | `doi` | string | yes (on release) | Reserved on Zenodo *before* the release is generated, so the frozen artifact is self-describing |
 | `nodes` | array | yes | |
 | `edges` | array | yes | |
