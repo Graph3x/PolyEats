@@ -1,4 +1,4 @@
-# PolyEats - dataset schema version 1.1.0
+# PolyEats - dataset schema version 1.1.1
 
 Specification for the published dataset: file layout, node/edge schema, enums, and serialization rules.
 
@@ -23,7 +23,7 @@ Specification for the published dataset: file layout, node/edge schema, enums, a
 | `timestamp` | iso timestamp (utc) | yes (on release) | |
 | `source` | object | yes (on release) | `{repo, commit}` |
 | `license` | string | yes | SPDX id — `Apache-2.0` |
-| `doi` | string | yes (on release) | Reserved on Zenodo *before* the release is generated, so the frozen artifact is self-describing |
+| `doi` | string | yes (on archived release) | Reserved on Zenodo *before* the release is generated, so the frozen artifact is self-describing. Null on releases that are not deposited |
 | `nodes` | array | yes | |
 | `edges` | array | yes | |
 

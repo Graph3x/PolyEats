@@ -7,9 +7,6 @@ import canonicalise
 from schema_constants import Constants
 
 
-# This is a quick AI draft not ment for use.
-# I will come back to refactor this later,
-# this file should server as reference only,
 def main():
     parser = argparse.ArgumentParser(
         description="stamp release metadata onto a canonical baseline"
@@ -18,7 +15,9 @@ def main():
     parser.add_argument("--dataset-version", required=True)
     parser.add_argument("--repo", required=True)
     parser.add_argument("--commit", required=True)
-    parser.add_argument("--doi", required=True)
+    parser.add_argument(
+        "--doi", help="only archived releases are deposited and get one"
+    )
     parser.add_argument("-o", "--output")
     arguments = parser.parse_args()
 
@@ -35,7 +34,7 @@ def main():
     formatter.validate()
     formatter.errors += [
         f"top level: {key!r} must not be null in a release"
-        for key in Constants.RELEASE_ONLY
+        for key in Constants.RELEASE_REQUIRED
         if not data.get(key)
     ]
     if formatter.errors:

@@ -42,7 +42,7 @@ class Constants:
         "observed",
     ]
 
-    RELEASE_ONLY: typing.ClassVar = ["dataset_version", "timestamp", "source", "doi"]
+    RELEASE_REQUIRED: typing.ClassVar = ["dataset_version", "timestamp", "source"]
 
     KINDS: typing.ClassVar = {
         "service",
