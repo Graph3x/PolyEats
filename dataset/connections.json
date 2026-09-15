@@ -212,9 +212,9 @@
       "observed": false
     },
     {
-      "id": "order-tracking.geocoding.50aeb9",
+      "id": "order-tracking.geocoding.2a5e9c",
       "caller": "order-tracking",
-      "caller_endpoint": "GET /test",
+      "caller_endpoint": "GET /tracking/{order_id}",
       "callee": "geocoding",
       "callee_endpoint": "Geocoding/ReverseGeocode",
       "type": "grpc",

@@ -48,7 +48,7 @@ def geocoding():
 
 def order_tracking():
     call("GET", f"{ORDER_TRACKING}/health")
-    call("GET", f"{ORDER_TRACKING}/test")
+    call("GET", f"{ORDER_TRACKING}/tracking/1")
 
 
 def address():

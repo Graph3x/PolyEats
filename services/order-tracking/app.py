@@ -8,6 +8,9 @@ from fastapi import FastAPI, Response
 
 TIMEOUT = 5.0
 
+# Stands in for a live position until courier-location exists.
+COURIER_POSITION = (49.7175, 14.4661)
+
 app = FastAPI()
 geocoding = geocoding_pb2_grpc.GeocodingStub(grpc_channel(os.environ["GEOCODING_ADDR"]))
 
@@ -17,17 +20,21 @@ def health():
     return Response(status_code=200)
 
 
-@app.get("/test")
-def test():
+@app.get("/tracking/{order_id}")
+def tracking(order_id: str):
+    latitude, longitude = COURIER_POSITION
     request = geocoding_pb2.ReverseGeocodeRequest(
-        coordinates=geocoding_pb2.Coordinates(lat=49.7175, lon=14.4661)
+        coordinates=geocoding_pb2.Coordinates(lat=latitude, lon=longitude)
     )
     address = geocoding.ReverseGeocode(request, timeout=TIMEOUT).address
     return {
-        "street": address.street,
-        "building_number": address.building_number,
-        "city": address.city,
-        "postal_code": address.postal_code,
+        "orderId": order_id,
+        "courierLocation": {
+            "street": address.street,
+            "buildingNumber": address.building_number,
+            "city": address.city,
+            "postalCode": address.postal_code,
+        },
     }
 
 
