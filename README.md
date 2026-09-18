@@ -10,7 +10,6 @@ A polyglot microservices benchmark for service architecture recovery (SAR) tools
 | `dataset/` | Published SDG + validation report and their schemas |
 | `infra/` | Tooling (release stamping, canonicalisation) |
 | `proto/` | gRPC definitions |
-| `libs/` | Shared libraries |
 
 ## License
 
