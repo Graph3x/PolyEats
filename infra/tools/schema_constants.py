@@ -14,6 +14,13 @@ class Constants:
         "edges",
     ]
     SOURCE_KEYS: typing.ClassVar = ["repo", "commit"]
+    VALIDATION_REPORT_KEYS: typing.ClassVar = [
+        "schema_version",
+        "dataset_version",
+        "timestamp",
+        "raters",
+        "notes",
+    ]
     NODE_KEYS: typing.ClassVar = [
         "id",
         "kind",

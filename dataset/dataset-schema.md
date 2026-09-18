@@ -9,7 +9,7 @@ Specification for the published dataset: file layout, node/edge schema, enums, a
 | File | Contents |
 |---|---|
 | `connections.json` | The dataset itself (nodes and edges) |
-| `validation-report.json` | Cohen's κ · how the rated sample was picked · who rated it |
+| `validation-report.json` | Validation report described by validation-report-schema.md |
 
 
 ---

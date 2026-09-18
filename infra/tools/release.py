@@ -19,6 +19,8 @@ def main():
         "--doi", help="only archived releases are deposited and get one"
     )
     parser.add_argument("-o", "--output")
+    parser.add_argument("--validation-report", help="path to validation-report.json")
+    parser.add_argument("--validation-report-output")
     arguments = parser.parse_args()
 
     with open(arguments.path) as source:
@@ -52,6 +54,27 @@ def main():
         print(f"{arguments.output} written", file=sys.stderr)
     else:
         sys.stdout.write(output)
+
+    if arguments.validation_report:
+        with open(arguments.validation_report) as source:
+            report = json.load(source)
+
+        report["dataset_version"] = arguments.dataset_version
+        report["timestamp"] = data["timestamp"]
+        report_output = (
+            json.dumps(
+                {key: report.get(key) for key in Constants.VALIDATION_REPORT_KEYS},
+                indent=2,
+            )
+            + "\n"
+        )
+
+        if arguments.validation_report_output:
+            with open(arguments.validation_report_output, "w") as destination:
+                destination.write(report_output)
+            print(f"{arguments.validation_report_output} written", file=sys.stderr)
+        else:
+            sys.stdout.write(report_output)
 
 
 if __name__ == "__main__":
