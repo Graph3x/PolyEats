@@ -31,8 +31,7 @@ Reported **pre-adjudication** — that is the honest reproducibility number.
 Final edge labels in `connections.json` are the post-adjudication
 consensus; this report does not restate them.
 
-An empty `raters` array means no independent rater has compared yet —
-expected pre-release, not on a tagged release.
+An empty `raters` array means no independent rater has compared yet — expected until the full release.
 
 ---
 
