@@ -22,11 +22,11 @@ def edge(**fields):
 
 def document(nodes=None, edges=None):
     return {
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.1",
         "dataset_version": None,
         "timestamp": None,
         "source": None,
-        "license": "CC-BY-4.0",
+        "license": "Apache-2.0",
         "doi": None,
         "nodes": nodes
         if nodes is not None
