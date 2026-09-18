@@ -3,5 +3,5 @@
   "dataset_version": null,
   "timestamp": null,
   "raters": [],
-  "notes": "Only single rater (maintainer, published as connections.json)"
+  "notes": "Only single rater (maintainer, published as connections.json); Observed marks from manual Jaeger inspection after infra/workload/run.py"
 }
