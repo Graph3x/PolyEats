@@ -175,6 +175,9 @@ class Formatter:
             Formatter._ordered(node, Constants.NODE_KEYS)
             for node in sorted(self.data["nodes"], key=lambda node: node["id"])
         ]
+        for edge in self.data["edges"]:
+            if edge.get("pattern") is not None:
+                edge["pattern"] = sorted(edge["pattern"])
         canonical["edges"] = [
             Formatter._ordered(edge, Constants.EDGE_KEYS)
             for edge in sorted(self.data["edges"], key=lambda edge: edge["id"])
