@@ -77,7 +77,7 @@
       "role": null,
       "derived_from": null,
       "static": true,
-      "observed": false
+      "observed": true
     },
     {
       "id": "address.db:address.943350",
@@ -93,7 +93,7 @@
       "role": null,
       "derived_from": null,
       "static": true,
-      "observed": false
+      "observed": true
     },
     {
       "id": "address.db:address.9b45f6",
@@ -109,7 +109,7 @@
       "role": null,
       "derived_from": null,
       "static": true,
-      "observed": false
+      "observed": true
     },
     {
       "id": "address.db:address.afb904",
@@ -125,7 +125,7 @@
       "role": null,
       "derived_from": null,
       "static": true,
-      "observed": false
+      "observed": true
     },
     {
       "id": "address.db:address.e07c8c",
@@ -141,7 +141,7 @@
       "role": null,
       "derived_from": null,
       "static": true,
-      "observed": false
+      "observed": true
     },
     {
       "id": "address.geocoding.044032",
@@ -159,7 +159,7 @@
       "role": null,
       "derived_from": null,
       "static": true,
-      "observed": false
+      "observed": true
     },
     {
       "id": "address.geocoding.728512",
@@ -177,7 +177,7 @@
       "role": null,
       "derived_from": null,
       "static": true,
-      "observed": false
+      "observed": true
     },
     {
       "id": "geocoding.db:geocoding.9f4a45",
@@ -193,7 +193,7 @@
       "role": null,
       "derived_from": null,
       "static": true,
-      "observed": false
+      "observed": true
     },
     {
       "id": "geocoding.db:geocoding.aa42b0",
@@ -209,7 +209,7 @@
       "role": null,
       "derived_from": null,
       "static": true,
-      "observed": false
+      "observed": true
     },
     {
       "id": "order-tracking.geocoding.2a5e9c",
@@ -227,7 +227,7 @@
       "role": null,
       "derived_from": null,
       "static": true,
-      "observed": false
+      "observed": true
     }
   ]
 }
