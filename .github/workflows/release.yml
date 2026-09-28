@@ -1,0 +1,55 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: docker compose up -d --build
+
+      - name: wait for services
+        run: |
+          for port in 8000 8001 8002; do
+            timeout 300 bash -c "until curl -sf localhost:$port/health > /dev/null; do sleep 2; done"
+          done
+
+      - run: python infra/workload/run.py
+
+      - name: wait for collector flush
+        run: sleep 5
+
+      - run: python infra/tools/observe.py traces/traces.jsonl
+
+      - name: stamp dataset
+        run: |
+          mkdir release
+          python infra/tools/release.py dataset/connections.json \
+            --dataset-version "${GITHUB_REF_NAME#v}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --commit "$GITHUB_SHA" \
+            -o release/connections.json \
+            --validation-report dataset/validation-report.json \
+            --validation-report-output release/validation-report.json
+
+      - name: publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" release/*.json --title "$GITHUB_REF_NAME" --verify-tag
+
+      - if: failure()
+        run: docker compose logs
+
+      - if: always()
+        run: docker compose down -v
