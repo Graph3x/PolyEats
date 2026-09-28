@@ -35,18 +35,6 @@ It exercises each service's `/health` and a few real endpoints, and exits non-ze
 
 Regenerates the Go and Python gRPC stubs from [proto/geocoding.proto](proto/geocoding.proto) and copies the `.proto` file into the address service (Java compiles it at build time).
 
-## Releases
-
-`infra/tools/release.py` stamps a canonical dataset file with `dataset_version`, a timestamp, and the source commit:
-
-```
-python infra/tools/release.py dataset/connections.json \
-  --dataset-version v1.0.0 --repo <owner>/PolyEats --commit <sha> \
-  -o connections.stamped.json
-```
-
-The stamped file embeds the commit it was built from, so it can't be committed back into that same commit (it would change the tree and invalidate the hash it records). Instead, the release artifact is published as a GitHub release asset — the stamped JSON, not a repo file.
-
 ## License
 
 Apache-2.0, see [LICENSE](LICENSE).

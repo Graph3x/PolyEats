@@ -7,6 +7,14 @@ receivers:
         endpoint: 0.0.0.0:4318
 
 processors:
+  filter/health:
+    error_mode: ignore
+    traces:
+      span:
+        - attributes["http.route"] == "/health"
+        - attributes["url.path"] == "/health"
+        # FastAPI's ASGI send spans carry neither attribute.
+        - IsMatch(name, "^GET /health http ")
   batch:
 
 exporters:
@@ -21,5 +29,5 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch]
+      processors: [filter/health, batch]
       exporters: [otlp/jaeger, file]

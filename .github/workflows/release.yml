@@ -30,7 +30,7 @@ jobs:
       - name: wait for collector flush
         run: sleep 5
 
-      - run: python infra/tools/observe.py traces/traces.jsonl
+      - run: python infra/tools/observe.py traces/traces.jsonl dataset/connections.json
 
       - name: stamp dataset
         run: |
