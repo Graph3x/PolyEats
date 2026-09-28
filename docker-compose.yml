@@ -13,8 +13,11 @@ services:
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.161.0
     command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    # Image runs as uid 10001; the host dir Docker creates for ./traces is root-owned.
+    user: "0"
     volumes:
       - ./infra/otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
+      - ./traces:/traces
     depends_on:
       - jaeger
     ports:

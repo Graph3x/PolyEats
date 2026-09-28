@@ -14,10 +14,12 @@ exporters:
     endpoint: jaeger:4317
     tls:
       insecure: true
+  file:
+    path: /traces/traces.jsonl
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/jaeger]
+      exporters: [otlp/jaeger, file]
