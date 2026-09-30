@@ -10,16 +10,23 @@ x-otel: &otel
   OTEL_LOGS_EXPORTER: none
 
 services:
+  polyeats-init:
+    image: busybox:1.37
+    command: ["chmod", "777", "/traces"]
+    volumes:
+      - ./traces:/traces
+
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.161.0
     command: ["--config=/etc/otelcol-contrib/config.yaml"]
-    # Image runs as uid 10001; the host dir Docker creates for ./traces is root-owned.
-    user: "0"
     volumes:
       - ./infra/otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
       - ./traces:/traces
     depends_on:
-      - jaeger
+      polyeats-init:
+        condition: service_completed_successfully
+      jaeger:
+        condition: service_started
     ports:
       - "4317:4317" # OTLP gRPC
       - "4318:4318" # OTLP HTTP
