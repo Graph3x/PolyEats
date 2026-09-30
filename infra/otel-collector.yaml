@@ -13,7 +13,6 @@ processors:
       span:
         - attributes["http.route"] == "/health"
         - attributes["url.path"] == "/health"
-        # FastAPI's ASGI send spans carry neither attribute.
         - IsMatch(name, "^GET /health http ")
   batch:
 

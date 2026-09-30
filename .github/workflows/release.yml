@@ -11,13 +11,14 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
-      - run: docker compose up -d --build
+      - name: start the containers
+        run: docker compose up -d --build
 
       - name: wait for services
         run: |
@@ -25,12 +26,14 @@ jobs:
             timeout 300 bash -c "until curl -sf localhost:$port/health > /dev/null; do sleep 2; done"
           done
 
-      - run: python infra/workload/run.py
+      - name: run the testing workload
+        run: python infra/workload/run.py
 
       - name: wait for collector flush
         run: sleep 5
 
-      - run: python infra/tools/observe.py traces/traces.jsonl dataset/connections.json
+      - name: mark observed traces in connections.json
+        run: python infra/tools/observe.py traces/traces.jsonl dataset/connections.json
 
       - name: stamp dataset
         run: |
