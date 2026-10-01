@@ -1,5 +1,6 @@
 import argparse
 import json
+import sys
 from pathlib import Path
 
 VERSION = "1.1.1"
@@ -10,6 +11,10 @@ class SchemaException(Exception):
 
 
 class PipelineException(Exception):
+    pass
+
+
+class SubmissionException(Exception):
     pass
 
 
@@ -37,8 +42,35 @@ class Grader:
             # TODO: apply adapter
             pass
 
+        self._validate(submission)
         self.submitted_nodes = submission["nodes"]
         self.submitted_edges = submission["edges"]
+
+    @staticmethod
+    def _validate(submission) -> None:
+        if not isinstance(submission, dict):
+            raise SubmissionException("submission must be a JSON object")
+
+        nodes = submission.get("nodes")
+        if not isinstance(nodes, list) or not all(isinstance(x, str) for x in nodes):
+            raise SubmissionException("'nodes' must be a list of node id strings")
+
+        edges = submission.get("edges")
+        if not isinstance(edges, list) or not all(
+            isinstance(x, dict)
+            and isinstance(x.get("caller"), str)
+            and isinstance(x.get("callee"), str)
+            for x in edges
+        ):
+            raise SubmissionException(
+                "'edges' must be a list of objects with string 'caller' and 'callee'"
+            )
+
+        unknown = {x[key] for x in edges for key in ("caller", "callee")} - set(nodes)
+        if unknown:
+            raise SubmissionException(
+                f"edges reference nodes missing from 'nodes': {sorted(unknown)}"
+            )
 
     def _score_base(self, nodes: list[dict], edges: list[dict]):
 
@@ -124,7 +156,10 @@ def main():
     arguments = parser.parse_args()
 
     grader = Grader(arguments.ground_truth)
-    grader.load(arguments.results_file, arguments.adapter)
+    try:
+        grader.load(arguments.results_file, arguments.adapter)
+    except (OSError, json.JSONDecodeError, SchemaException, SubmissionException) as error:
+        sys.exit(f"error: {error}")
     result = grader.score(arguments.dbs, arguments.async_edges, arguments.extended)
 
     print(json.dumps(result))
