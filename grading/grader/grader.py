@@ -74,7 +74,7 @@ class Grader:
         # TODO: score with modifiers
         return ([], [], [])
 
-    def score(self, dbs: bool, broker: bool, extended: bool) -> dict:
+    def score(self, dbs: bool, async_edges: bool, extended: bool) -> dict:
         if self.nodes is None:
             raise PipelineException("Scoring without loaded data")
 
@@ -82,7 +82,7 @@ class Grader:
             self.nodes = [x for x in self.nodes if x["kind"] != "datastore"]
             self.edges = [x for x in self.edges if x["type"] != "query"]
 
-        if not broker:
+        if not async_edges:
             pass  # TODO
 
         if extended:
@@ -90,8 +90,9 @@ class Grader:
         else:
             correct, missing, additional = self._score_base()
 
-        # TODO: more detailed statistics
+        # TODO: more detailed statistics (per pattern scoring...)
         return {
+            "version": self.dataset_version,
             "correct": len(correct),
             "missing": len(missing),
             "additional": len(additional),
@@ -105,9 +106,16 @@ def main():
     parser = argparse.ArgumentParser(description="The PolyEats result grading utility")
     parser.add_argument("results_file")
     parser.add_argument("--adapter", required=False)
-    parser.add_argument("--ground_truth", default=expected_connections)
+    parser.add_argument(
+        "--ground-truth", dest="ground_truth", default=expected_connections
+    )
     parser.add_argument("--dbs", action=argparse.BooleanOptionalAction, default=False)
-    parser.add_argument("--broker", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument(
+        "--async",
+        dest="async_edges",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
     parser.add_argument(
         "--extended", action=argparse.BooleanOptionalAction, default=False
     )
@@ -116,9 +124,9 @@ def main():
 
     grader = Grader(arguments.ground_truth)
     grader.load(arguments.results_file, arguments.adapter)
-    result = grader.score(arguments.dbs, arguments.broker, arguments.extended)
+    result = grader.score(arguments.dbs, arguments.async_edges, arguments.extended)
 
-    print(result)
+    print(json.dumps(result))
 
 
 if __name__ == "__main__":
