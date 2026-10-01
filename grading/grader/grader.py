@@ -49,32 +49,23 @@ class Grader:
                 your naming convention matches the folder names"""
             )
 
-        correct_edges = []
-        missing_edges = []
-        additional_edges = []
+        truth = self._collapse(self.edges)
+        submitted = self._collapse(self.submitted_edges)
 
-        for edge in self.edges:
-            for candidate in self.submitted_edges:
-                if (
-                    edge["caller"] == candidate["caller"]
-                    and edge["callee"] == candidate["callee"]
-                ):
-                    correct_edges.append(edge)
-                    break
-            else:
-                missing_edges.append(edge)
-
-        for edge in self.submitted_edges:
-            for candidate in self.edges:
-                if (
-                    edge["caller"] == candidate["caller"]
-                    and edge["callee"] == candidate["callee"]
-                ):
-                    break
-            else:
-                additional_edges.append(edge)
+        correct_edges = [edges for pair, edges in truth.items() if pair in submitted]
+        missing_edges = [edges for pair, edges in truth.items() if pair not in submitted]
+        additional_edges = [
+            edges for pair, edges in submitted.items() if pair not in truth
+        ]
 
         return (correct_edges, missing_edges, additional_edges)
+
+    @staticmethod
+    def _collapse(edges: list[dict]) -> dict[tuple[str, str], list[dict]]:
+        pairs = {}
+        for edge in edges:
+            pairs.setdefault((edge["caller"], edge["callee"]), []).append(edge)
+        return pairs
 
     def _score_extended(self):
         # TODO: compare result to ground truth
