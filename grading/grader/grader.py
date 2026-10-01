@@ -40,16 +40,16 @@ class Grader:
         self.submitted_nodes = submission["nodes"]
         self.submitted_edges = submission["edges"]
 
-    def _score_base(self):
+    def _score_base(self, nodes: list[dict], edges: list[dict]):
 
-        if {x["id"] for x in self.nodes} != set(self.submitted_nodes):
+        if {x["id"] for x in nodes} != set(self.submitted_nodes):
             print(
                 "You have a node mismatch - this generally shouldnt happen.\n"
                 "Please check that you are using a correct adapter and that "
                 "your naming convention matches the folder names"
             )
 
-        truth = self._collapse(self.edges)
+        truth = self._collapse(edges)
         submitted = self._collapse(self.submitted_edges)
 
         correct_edges = [edges for pair, edges in truth.items() if pair in submitted]
@@ -69,7 +69,7 @@ class Grader:
             pairs.setdefault((edge["caller"], edge["callee"]), []).append(edge)
         return pairs
 
-    def _score_extended(self):
+    def _score_extended(self, nodes: list[dict], edges: list[dict]):
         # TODO: compare result to ground truth
         # TODO: score with modifiers
         return ([], [], [])
@@ -78,17 +78,18 @@ class Grader:
         if self.nodes is None:
             raise PipelineException("Scoring without loaded data")
 
+        nodes, edges = self.nodes, self.edges
         if not dbs:
-            self.nodes = [x for x in self.nodes if x["kind"] != "datastore"]
-            self.edges = [x for x in self.edges if x["type"] != "query"]
+            nodes = [x for x in nodes if x["kind"] != "datastore"]
+            edges = [x for x in edges if x["type"] != "query"]
 
         if not async_edges:
             pass  # TODO
 
         if extended:
-            correct, missing, additional = self._score_extended()
+            correct, missing, additional = self._score_extended(nodes, edges)
         else:
-            correct, missing, additional = self._score_base()
+            correct, missing, additional = self._score_base(nodes, edges)
 
         # TODO: more detailed statistics (per pattern scoring...)
         return {
