@@ -2,6 +2,8 @@ import argparse
 import json
 import re
 import sys
+from collections.abc import Generator
+from typing import Any
 
 import canonicalise
 from schema_constants import Constants
@@ -11,32 +13,36 @@ SUPPORTED_TYPES = {"rest", "grpc", "query"}
 TABLE = re.compile(r"\b(?:FROM|INTO|UPDATE|JOIN)\s+([\w.]+)", re.IGNORECASE)
 
 
-def attributes(item):
+def get_attributes(item: dict) -> dict[str, Any]:
     return {
         attribute["key"]: next(iter(attribute["value"].values()), None)
         for attribute in item.get("attributes", [])
     }
 
 
-def spans(path):
+def parse_resource_spans(resource_spans: dict[str, Any], service: str) -> Generator:
+    for scope_spans in resource_spans.get("scopeSpans", []):
+        for span in scope_spans.get("spans", []):
+            yield {
+                "key": (span["traceId"], span["spanId"]),
+                "parent": (span["traceId"], span.get("parentSpanId", "")),
+                "service": service,
+                "kind": span.get("kind"),
+                "name": span["name"],
+                "attributes": get_attributes(span),
+            }
+
+
+def spans(path: str) -> Generator:
     with open(path) as source:
         for line in source:
             if not line.strip():
                 continue
             for resource_spans in json.loads(line).get("resourceSpans", []):
-                service = attributes(resource_spans.get("resource", {})).get(
+                service = get_attributes(resource_spans.get("resource", {})).get(
                     "service.name"
                 )
-                for scope_spans in resource_spans.get("scopeSpans", []):
-                    for span in scope_spans.get("spans", []):
-                        yield {
-                            "key": (span["traceId"], span["spanId"]),
-                            "parent": (span["traceId"], span.get("parentSpanId", "")),
-                            "service": service,
-                            "kind": span.get("kind"),
-                            "name": span["name"],
-                            "attributes": attributes(span),
-                        }
+                yield from parse_resource_spans(resource_spans, service)
 
 
 def endpoint(server):
@@ -67,41 +73,43 @@ def table(attrs):
     return match and match.group(1)
 
 
-def callee(client, servers):
-    attrs = client["attributes"]
+def callee(client_span: dict, servers: dict):
+    attrs = client_span["attributes"]
     if "db.system" in attrs or "db.system.name" in attrs:
         name = table(attrs)
         # Every service owns its datastore, and sqlite spans carry no database name.
-        return name and ("query", f"db:{client['service']}", name)
+        return name and ("query", f"db:{client_span['service']}", name)
 
-    server = servers.get(client["key"])
+    server = servers.get(client_span["key"])
     if server is None:
         return None
     edge_type = "grpc" if "rpc.method" in attrs else "rest"
     return edge_type, server["service"], endpoint(server)
 
 
-def observed_edges(path, kinds):
+def observed_edges(path: str, kinds: dict):
     collected = list(spans(path))
     by_key = {span["key"]: span for span in collected}
     servers = {span["parent"]: span for span in collected if span["kind"] == SERVER}
 
     edges = {}
     undeclared = set()
-    for client in collected:
-        if client["kind"] != CLIENT:
+
+    for client_span in collected:
+        if client_span["kind"] != CLIENT:
             continue
-        target = callee(client, servers)
-        server = enclosing_server(client, by_key)
+
+        target = callee(client_span, servers)
+        server = enclosing_server(client_span, by_key)
         if target is None or server is None:
             continue
 
         edge_type, callee_node, callee_endpoint = target
-        undeclared |= {client["service"], callee_node} - kinds.keys()
+        undeclared |= {client_span["service"], callee_node} - kinds.keys()
 
         edge = dict.fromkeys(Constants.EDGE_KEYS)
         edge |= {
-            "caller": client["service"],
+            "caller": client_span["service"],
             "caller_endpoint": endpoint(server),
             "callee": callee_node,
             "callee_endpoint": callee_endpoint,
@@ -134,8 +142,6 @@ def main():
 
     kinds = {node["id"]: node["kind"] for node in data["nodes"]}
     observed = observed_edges(arguments.traces, kinds)
-    if not observed:
-        sys.exit("no edges observed")
 
     declared = {edge["id"] for edge in data["edges"]}
     for edge in data["edges"]:
