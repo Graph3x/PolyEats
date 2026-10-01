@@ -21,10 +21,10 @@ class Grader:
 
     def load(self, submission_path: str, adapter: str | None) -> None:
         with open(submission_path, "r") as f:
-            submission = json.loads(f.read())
+            submission = json.load(f)
 
         with open(self.dataset, "r") as f:
-            truth = json.loads(f.read())
+            truth = json.load(f)
 
         if truth.get("schema_version", "") != VERSION:
             raise SchemaException("Dataset schema doesnt match grader!")
@@ -44,16 +44,18 @@ class Grader:
 
         if {x["id"] for x in self.nodes} != set(self.submitted_nodes):
             print(
-                """You have a node mismatch - this generally shouldnt happen.
-                Please check that you are using a correct adapter and that 
-                your naming convention matches the folder names"""
+                "You have a node mismatch - this generally shouldnt happen.\n"
+                "Please check that you are using a correct adapter and that "
+                "your naming convention matches the folder names"
             )
 
         truth = self._collapse(self.edges)
         submitted = self._collapse(self.submitted_edges)
 
         correct_edges = [edges for pair, edges in truth.items() if pair in submitted]
-        missing_edges = [edges for pair, edges in truth.items() if pair not in submitted]
+        missing_edges = [
+            edges for pair, edges in truth.items() if pair not in submitted
+        ]
         additional_edges = [
             edges for pair, edges in submitted.items() if pair not in truth
         ]
