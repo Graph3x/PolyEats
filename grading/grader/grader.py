@@ -158,7 +158,12 @@ def main():
     grader = Grader(arguments.ground_truth)
     try:
         grader.load(arguments.results_file, arguments.adapter)
-    except (OSError, json.JSONDecodeError, SchemaException, SubmissionException) as error:
+    except (
+        OSError,
+        json.JSONDecodeError,
+        SchemaException,
+        SubmissionException,
+    ) as error:
         sys.exit(f"error: {error}")
     result = grader.score(arguments.dbs, arguments.async_edges, arguments.extended)
 
