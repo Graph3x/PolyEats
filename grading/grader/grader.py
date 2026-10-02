@@ -24,7 +24,7 @@ class Grader:
         self.nodes = None
         self.edges = None
 
-    def load(self, submission_path: str, adapter: str | None) -> None:
+    def load(self, submission_path: str) -> None:
         with open(submission_path, "r") as f:
             submission = json.load(f)
 
@@ -37,10 +37,6 @@ class Grader:
         self.dataset_version = truth["dataset_version"]
         self.nodes = truth["nodes"]
         self.edges = truth["edges"]
-
-        if adapter:
-            # TODO: apply adapter
-            pass
 
         self._validate(submission)
         self.submitted_nodes = submission["nodes"]
@@ -138,7 +134,6 @@ def main():
 
     parser = argparse.ArgumentParser(description="The PolyEats result grading utility")
     parser.add_argument("results_file")
-    parser.add_argument("--adapter", required=False)
     parser.add_argument(
         "--ground-truth", dest="ground_truth", default=expected_connections
     )
@@ -157,7 +152,7 @@ def main():
 
     grader = Grader(arguments.ground_truth)
     try:
-        grader.load(arguments.results_file, arguments.adapter)
+        grader.load(arguments.results_file)
     except (
         OSError,
         json.JSONDecodeError,
