@@ -1,13 +1,14 @@
 # PolyEats
 
-A polyglot microservices benchmark for service architecture recovery (SAR) tools, built around a food-delivery system. Ground truth ships as a Service Dependency Graph (SDG) — see [dataset/dataset-schema.md](dataset/dataset-schema.md).
+A polyglot (Go, Java, Python) microservices benchmark for  software architecture recovery (SAR) tools, built around a food-delivery system. Ground truth ships as an annotated dependency graph: services, datastores and message destinations as nodes, typed endpoint-level edges labelled with the SAR pattern that obscures them and whether each is statically resolvable and/or observed at runtime. See [dataset/dataset-schema.md](dataset/dataset-schema.md). A grader in [grading/](grading/) scores tool output against it.
 
 ## Layout
 
 | Path | Contents |
 |---|---|
 | `services/` | The benchmark's microservices |
-| `dataset/` | Published SDG + validation report and their schemas |
+| `dataset/` | Published dependency graph + validation report and their schemas |
+| `grading/` | Grader and naive baseline |
 | `infra/` | Tooling (release stamping, canonicalisation) |
 | `proto/` | gRPC definitions |
 
@@ -17,9 +18,9 @@ A polyglot microservices benchmark for service architecture recovery (SAR) tools
 docker compose up --build
 ```
 
-Brings up all services plus Jaeger. Traces: [http://localhost:16686](http://localhost:16686). REST ports: geocoding `8000`, order-tracking `8001`, address `8002`.
+Brings up the entire stack. Jaeger (traces) is available at [http://localhost:16686](http://localhost:16686).
 
-Once everything is healthy, run the smoke test against the running stack:
+Once everything is healthy, you can run the smoke test against the running stack:
 
 ```
 python infra/workload/run.py
@@ -27,13 +28,27 @@ python infra/workload/run.py
 
 It exercises each service's `/health` and a few real endpoints, and exits non-zero on any unexpected status code.
 
-## Regenerating protos
+## Grading
+
+A submission is a JSON file listing the nodes and caller → callee edges your tool recovered:
+
+```json
+{
+  "nodes": ["address", "geocoding", "db:address"],
+  "edges": [
+    {"caller": "address", "callee": "geocoding"},
+    {"caller": "address", "callee": "db:address"}
+  ]
+}
+```
+
+Services are named after their folder in `services/`, datastores as `db:<name>` named after the service that owns them (`db:geocoding`). Every caller and callee must appear in `nodes`.
 
 ```
-./proto/build.sh
+python grading/grader/grader.py results.json [--dbs]
 ```
 
-Regenerates the Go and Python gRPC stubs from [proto/geocoding.proto](proto/geocoding.proto) and copies the `.proto` file into the address service (Java compiles it at build time).
+Datastores are ignored unless `--dbs` is passed. The grader prints the number of `correct`, `missing` and `additional` caller → callee pairs. For a reference point, [grading/baselines/baseline.py](grading/baselines/baseline.py) produces a submission with a naive grep: `python grading/baselines/baseline.py services --output results.json`.
 
 ## License
 
