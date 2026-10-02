@@ -111,8 +111,10 @@ class Grader:
             nodes = [x for x in nodes if x["kind"] != "datastore"]
             edges = [x for x in edges if x["type"] != "query"]
 
-        if not async_edges:
-            pass  # TODO
+        if async_edges:
+            raise NotImplementedError()
+        else:
+            pass #TODO
 
         if extended:
             correct, missing, additional = self._score_extended(nodes, edges)
