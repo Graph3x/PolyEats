@@ -39,8 +39,8 @@ class Grader:
         self.edges = truth["edges"]
 
         self._validate(submission)
-        self.submitted_nodes = submission["nodes"]
-        self.submitted_edges = submission["edges"]
+        self.submitted_nodes: list[str] = submission["nodes"]
+        self.submitted_edges: list[dict[str, str]] = submission["edges"]
 
     @staticmethod
     def _validate(submission) -> None:
@@ -68,17 +68,17 @@ class Grader:
                 f"edges reference nodes missing from 'nodes': {sorted(unknown)}"
             )
 
-    def _score_base(self, nodes: list[dict], edges: list[dict]):
+    def _score_base(self):
 
-        if {x["id"] for x in nodes} != set(self.submitted_nodes):
+        if {x["id"] for x in self.work_nodes} != set(self.work_sub_nodes):
             print(
-                "You have a node mismatch - this generally shouldnt happen.\n"
-                "Please check that your naming convention matches the folder names",
+                "You have a node mismatch - this generally shouldn't happen.\n"
+                "Please check your naming convention.",
                 file=sys.stderr,
             )
 
-        truth = self._collapse(edges)
-        submitted = self._collapse(self.submitted_edges)
+        truth = self._collapse(self.work_edges)
+        submitted = self._collapse(self.work_sub_edges)
 
         correct_edges = [edges for pair, edges in truth.items() if pair in submitted]
         missing_edges = [
@@ -97,29 +97,38 @@ class Grader:
             pairs.setdefault((edge["caller"], edge["callee"]), []).append(edge)
         return pairs
 
-    def _score_extended(self, nodes: list[dict], edges: list[dict]):
+    def _score_extended(self):
         # TODO: compare result to ground truth
         # TODO: score with modifiers
-        raise NotImplementedError()
+        raise NotImplementedError("Extended scoring not implemented")
 
     def score(self, dbs: bool, async_edges: bool, extended: bool) -> dict:
         if self.nodes is None:
             raise PipelineException("Scoring without loaded data")
 
-        nodes, edges = self.nodes, self.edges
+        self.work_nodes, self.work_edges = self.nodes, self.edges
+        self.work_sub_nodes = self.submitted_nodes
+        self.work_sub_edges = self.submitted_edges
+
         if not dbs:
-            nodes = [x for x in nodes if x["kind"] != "datastore"]
-            edges = [x for x in edges if x["type"] != "query"]
+            self.work_nodes = [x for x in self.nodes if x["kind"] != "datastore"]
+            self.work_edges = [x for x in self.edges if x["type"] != "query"]
+            self.work_sub_nodes = [
+                x for x in self.submitted_nodes if not x.startswith("db:")
+            ]
+            self.work_sub_edges = [
+                x for x in self.submitted_edges if not x["callee"].startswith("db:")
+            ]
 
         if async_edges:
-            raise NotImplementedError()
+            raise NotImplementedError("Async not implemented")
         else:
             pass  # TODO
 
         if extended:
-            correct, missing, additional = self._score_extended(nodes, edges)
+            correct, missing, additional = self._score_extended()
         else:
-            correct, missing, additional = self._score_base(nodes, edges)
+            correct, missing, additional = self._score_base()
 
         # TODO: more detailed statistics (per pattern scoring...)
         return {
@@ -160,12 +169,14 @@ def main():
         json.JSONDecodeError,
         SchemaException,
         SubmissionException,
-        NotImplementedError
     ) as error:
         sys.exit(f"error: {error}")
-    result = grader.score(arguments.dbs, arguments.async_edges, arguments.extended)
 
-    print(json.dumps(result))
+    try:
+        result = grader.score(arguments.dbs, arguments.async_edges, arguments.extended)
+        print(json.dumps(result))
+    except NotImplementedError as error:
+        sys.exit(f"error: {error}")
 
 
 if __name__ == "__main__":
