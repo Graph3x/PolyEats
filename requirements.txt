@@ -1,4 +1,4 @@
-pytest
-grpcio-tools
-ruff
-mypy
+pytest==9.1.1
+grpcio-tools==1.83.1
+ruff==0.16.6
+mypy==2.3.1
