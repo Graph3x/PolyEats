@@ -77,8 +77,8 @@ class Grader:
         if {x["id"] for x in nodes} != set(self.submitted_nodes):
             print(
                 "You have a node mismatch - this generally shouldnt happen.\n"
-                "Please check that you are using a correct adapter and that "
-                "your naming convention matches the folder names"
+                "Please check that your naming convention matches the folder names",
+                file=sys.stderr,
             )
 
         truth = self._collapse(edges)
@@ -104,7 +104,7 @@ class Grader:
     def _score_extended(self, nodes: list[dict], edges: list[dict]):
         # TODO: compare result to ground truth
         # TODO: score with modifiers
-        return ([], [], [])
+        raise NotImplementedError()
 
     def score(self, dbs: bool, async_edges: bool, extended: bool) -> dict:
         if self.nodes is None:
