@@ -153,7 +153,7 @@ def main():
         "--async",
         dest="async_edges",
         action=argparse.BooleanOptionalAction,
-        default=True,
+        default=False,
     )
     parser.add_argument(
         "--extended", action=argparse.BooleanOptionalAction, default=False
