@@ -114,7 +114,7 @@ class Grader:
         if async_edges:
             raise NotImplementedError()
         else:
-            pass #TODO
+            pass  # TODO
 
         if extended:
             correct, missing, additional = self._score_extended(nodes, edges)
@@ -160,6 +160,7 @@ def main():
         json.JSONDecodeError,
         SchemaException,
         SubmissionException,
+        NotImplementedError
     ) as error:
         sys.exit(f"error: {error}")
     result = grader.score(arguments.dbs, arguments.async_edges, arguments.extended)
