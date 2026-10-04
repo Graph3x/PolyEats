@@ -95,11 +95,29 @@ services:
     networks:
       - polyeats
 
+  auth-valkey:
+    image: valkey/valkey:9.1
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - polyeats
+
   auth:
     build: ./services/auth
+    depends_on:
+      auth-valkey:
+        condition: service_healthy
     environment:
       <<: *otel
       OTEL_SERVICE_NAME: auth
+      VALKEY_ADDR: auth-valkey:6379
+      ACCOUNT_URL: http://account:8080
+      JWT_KEY_PATH: /keys/dev.pem
+    volumes:
+      - ./services/auth/keys/dev.pem:/keys/dev.pem:ro
     ports:
       - "8003:8080" # REST
       - "9003:9090" # gRPC

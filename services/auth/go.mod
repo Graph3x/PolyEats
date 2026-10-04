@@ -3,6 +3,9 @@ module auth
 go 1.27
 
 require (
+	github.com/golang-jwt/jwt/v5 v5.3.1
+	github.com/valkey-io/valkey-go v1.0.78
+	github.com/valkey-io/valkey-go/valkeyotel v1.0.78
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.71.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.70.0
 	go.opentelemetry.io/otel v1.46.0
