@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
+	"errors"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -29,16 +32,96 @@ type authServer struct {
 	accountURL string
 }
 
+var errUnauthenticated = status.Error(codes.Unauthenticated, "invalid credentials or token")
+
+func unavailable(err error) error {
+	log.Printf("unavailable: %v", err)
+	return status.Error(codes.Unavailable, "dependency unavailable")
+}
+
 func (s *authServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.TokenPair, error) {
-	return nil, status.Error(codes.Unimplemented, "not implemented")
+	identity, err := s.verifyCredentials(ctx, req.Email, req.Password)
+	if errors.Is(err, errInvalidCredentials) {
+		return nil, errUnauthenticated
+	}
+	if err != nil {
+		return nil, unavailable(err)
+	}
+
+	familyID, secret := rand.Text(), rand.Text()
+	sess := session{AccountID: identity.AccountID, Epoch: identity.Epoch, Hash: hashSecret(secret)}
+	if err := s.createSession(ctx, familyID, sess); err != nil {
+		return nil, unavailable(err)
+	}
+	return s.tokenPair(identity.AccountID, identity.Role, familyID, secret)
 }
 
 func (s *authServer) Refresh(ctx context.Context, req *pb.RefreshRequest) (*pb.TokenPair, error) {
-	return nil, status.Error(codes.Unimplemented, "not implemented")
+	familyID, secret, ok := strings.Cut(req.RefreshToken, ".")
+	if !ok {
+		return nil, errUnauthenticated
+	}
+	sess, err := getSession(ctx, s.store, familyID)
+	if errors.Is(err, errSessionNotFound) {
+		return nil, errUnauthenticated
+	}
+	if err != nil {
+		return nil, unavailable(err)
+	}
+	if sess.Hash != hashSecret(secret) {
+		return nil, s.revoke(ctx, familyID)
+	}
+
+	state, err := s.getAccountState(ctx, sess.AccountID)
+	if errors.Is(err, errAccountNotFound) || (err == nil && state.Epoch != sess.Epoch) {
+		return nil, s.revoke(ctx, familyID)
+	}
+	if err != nil {
+		return nil, unavailable(err)
+	}
+
+	newSecret := rand.Text()
+	err = s.rotateSession(ctx, familyID, sess.Hash, hashSecret(newSecret))
+	if errors.Is(err, errTokenReused) {
+		return nil, s.revoke(ctx, familyID)
+	}
+	if errors.Is(err, errSessionNotFound) {
+		return nil, errUnauthenticated
+	}
+	if err != nil {
+		return nil, unavailable(err)
+	}
+	return s.tokenPair(sess.AccountID, state.Role, familyID, newSecret)
 }
 
 func (s *authServer) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.LogoutResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "not implemented")
+	familyID, _, ok := strings.Cut(req.RefreshToken, ".")
+	if !ok {
+		return &pb.LogoutResponse{}, nil
+	}
+	if err := s.deleteSession(ctx, familyID); err != nil {
+		return nil, unavailable(err)
+	}
+	return &pb.LogoutResponse{}, nil
+}
+
+func (s *authServer) revoke(ctx context.Context, familyID string) error {
+	if err := s.deleteSession(ctx, familyID); err != nil {
+		return unavailable(err)
+	}
+	return errUnauthenticated
+}
+
+func (s *authServer) tokenPair(accountID, role, familyID, secret string) (*pb.TokenPair, error) {
+	access, err := s.keys.issueAccessToken(accountID, role)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "sign access token")
+	}
+	return &pb.TokenPair{
+		AccessToken:  access,
+		RefreshToken: familyID + "." + secret,
+		ExpiresIn:    int32(accessTokenTTL.Seconds()),
+	}, nil
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
