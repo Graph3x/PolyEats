@@ -98,6 +98,7 @@ class Constants:
         "conditional-branch",
         "closure-captured",
         "gateway-indirection",
+        "lookup-table",
         "service-discovery-lookup",
     }
     PATTERN_TYPES: typing.ClassVar = {"rest", "grpc", "grpc-stream"}
