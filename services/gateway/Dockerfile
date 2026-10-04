@@ -1,0 +1,14 @@
+# Dockerfile — gateway. Go template.
+
+ARG GO_VERSION=1.27.0
+
+FROM golang:${GO_VERSION}-alpine AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -o /service ./cmd/service
+
+FROM gcr.io/distroless/static-debian13
+COPY --from=build /service /service
+ENTRYPOINT ["/service"]

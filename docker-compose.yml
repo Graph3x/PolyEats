@@ -9,6 +9,9 @@ x-otel: &otel
   OTEL_METRICS_EXPORTER: none
   OTEL_LOGS_EXPORTER: none
 
+x-jwks: &jwks
+  JWKS_URL: http://auth:8080/.well-known/jwks.json
+
 services:
   polyeats-init:
     image: busybox:1.37
@@ -53,6 +56,17 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    networks:
+      - polyeats
+
+  gateway:
+    build: ./services/gateway
+    environment:
+      <<: [*otel, *jwks]
+      OTEL_SERVICE_NAME: gateway
+      AUTH_ADDR: auth:9090
+    ports:
+      - "8004:8080" # REST
     networks:
       - polyeats
 

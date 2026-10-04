@@ -17,6 +17,12 @@ protoc -I . \
   --go-grpc_out=services/auth --go-grpc_opt=paths=source_relative \
   proto/auth.proto
 
+echo "gateway (go)"
+protoc -I . \
+  --go_out=services/gateway --go_opt=paths=source_relative \
+  --go-grpc_out=services/gateway --go-grpc_opt=paths=source_relative \
+  proto/auth.proto
+
 echo "order-tracking (python)"
 python -m grpc_tools.protoc -I proto \
   --python_out=services/order-tracking \
