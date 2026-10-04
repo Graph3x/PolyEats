@@ -9,7 +9,12 @@ import (
 	"syscall"
 	"time"
 
+	pb "gateway/proto"
+
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,9 +30,17 @@ func main() {
 		log.Fatalf("tracing: %v", err)
 	}
 
+	authConn, err := grpc.NewClient(os.Getenv("AUTH_ADDR"),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithStatsHandler(otelgrpc.NewClientHandler()))
+	if err != nil {
+		log.Fatalf("auth client: %v", err)
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", healthHandler)
-	if err := registerRoutes(mux); err != nil {
+	registerAuth(mux, pb.NewAuthClient(authConn))
+	if err := registerRoutes(mux, newVerifier(os.Getenv("JWKS_URL"))); err != nil {
 		log.Fatalf("routes: %v", err)
 	}
 	httpServer := &http.Server{Addr: ":8080", Handler: otelhttp.NewHandler(mux, "gateway")}
@@ -48,5 +61,6 @@ func main() {
 	defer cancel()
 
 	httpServer.Shutdown(shutdownCtx)
+	authConn.Close()
 	shutdown(shutdownCtx)
 }
