@@ -11,6 +11,12 @@ protoc -I . \
   --go-grpc_out=services/geocoding --go-grpc_opt=paths=source_relative \
   proto/geocoding.proto
 
+echo "auth (go)"
+protoc -I . \
+  --go_out=services/auth --go_opt=paths=source_relative \
+  --go-grpc_out=services/auth --go-grpc_opt=paths=source_relative \
+  proto/auth.proto
+
 echo "order-tracking (python)"
 python -m grpc_tools.protoc -I proto \
   --python_out=services/order-tracking \
