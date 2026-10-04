@@ -40,6 +40,22 @@ services:
     networks:
       - polyeats
 
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: address
+      POSTGRES_USER: polyeats
+      POSTGRES_PASSWORD: polyeats
+    volumes:
+      - ./services/address/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U polyeats -d address"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - polyeats
+
   geocoding:
     build: ./services/geocoding
     environment:
@@ -63,22 +79,6 @@ services:
     networks:
       - polyeats
 
-  postgres:
-    image: postgres:18
-    environment:
-      POSTGRES_DB: address
-      POSTGRES_USER: polyeats
-      POSTGRES_PASSWORD: polyeats
-    volumes:
-      - ./services/address/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U polyeats -d address"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-    networks:
-      - polyeats
-
   address:
     build: ./services/address
     depends_on:
@@ -92,5 +92,16 @@ services:
       POSTGRES_PASSWORD: polyeats
     ports:
       - "8002:8080" # REST
+    networks:
+      - polyeats
+
+  auth:
+    build: ./services/auth
+    environment:
+      <<: *otel
+      OTEL_SERVICE_NAME: auth
+    ports:
+      - "8003:8080" # REST
+      - "9003:9090" # gRPC
     networks:
       - polyeats
