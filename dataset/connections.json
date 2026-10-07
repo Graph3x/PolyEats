@@ -213,39 +213,7 @@
       "observed": false
     },
     {
-      "id": null,
-      "caller": "auth",
-      "caller_endpoint": "Auth/Login",
-      "callee": "db:auth",
-      "callee_endpoint": "session",
-      "type": "query",
-      "pattern": null,
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": null,
-      "caller": "auth",
-      "caller_endpoint": "Auth/Logout",
-      "callee": "db:auth",
-      "callee_endpoint": "session",
-      "type": "query",
-      "pattern": null,
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": null,
+      "id": "auth.db:auth.6dabb6",
       "caller": "auth",
       "caller_endpoint": "Auth/Refresh",
       "callee": "db:auth",
@@ -261,15 +229,13 @@
       "observed": false
     },
     {
-      "id": null,
-      "caller": "gateway",
-      "caller_endpoint": "POST /auth/login",
-      "callee": "auth",
-      "callee_endpoint": "Auth/Login",
-      "type": "grpc",
-      "pattern": [
-        "env-var-config"
-      ],
+      "id": "auth.db:auth.779d86",
+      "caller": "auth",
+      "caller_endpoint": "Auth/Login",
+      "callee": "db:auth",
+      "callee_endpoint": "session",
+      "type": "query",
+      "pattern": null,
       "routing_key": null,
       "headers": null,
       "selector": null,
@@ -279,15 +245,13 @@
       "observed": false
     },
     {
-      "id": null,
-      "caller": "gateway",
-      "caller_endpoint": "POST /auth/logout",
-      "callee": "auth",
-      "callee_endpoint": "Auth/Logout",
-      "type": "grpc",
-      "pattern": [
-        "env-var-config"
-      ],
+      "id": "auth.db:auth.de25b7",
+      "caller": "auth",
+      "caller_endpoint": "Auth/Logout",
+      "callee": "db:auth",
+      "callee_endpoint": "session",
+      "type": "query",
+      "pattern": null,
       "routing_key": null,
       "headers": null,
       "selector": null,
@@ -297,25 +261,7 @@
       "observed": false
     },
     {
-      "id": null,
-      "caller": "gateway",
-      "caller_endpoint": "POST /auth/refresh",
-      "callee": "auth",
-      "callee_endpoint": "Auth/Refresh",
-      "type": "grpc",
-      "pattern": [
-        "env-var-config"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": null,
+      "id": "gateway.auth.170744",
       "caller": "gateway",
       "caller_endpoint": "GET /order-tracking/tracking/{order_id}",
       "callee": "auth",
@@ -333,7 +279,61 @@
       "observed": false
     },
     {
-      "id": null,
+      "id": "gateway.auth.4d165d",
+      "caller": "gateway",
+      "caller_endpoint": "POST /auth/logout",
+      "callee": "auth",
+      "callee_endpoint": "Auth/Logout",
+      "type": "grpc",
+      "pattern": [
+        "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.auth.5bfe18",
+      "caller": "gateway",
+      "caller_endpoint": "POST /auth/refresh",
+      "callee": "auth",
+      "callee_endpoint": "Auth/Refresh",
+      "type": "grpc",
+      "pattern": [
+        "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.auth.d30073",
+      "caller": "gateway",
+      "caller_endpoint": "POST /auth/login",
+      "callee": "auth",
+      "callee_endpoint": "Auth/Login",
+      "type": "grpc",
+      "pattern": [
+        "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.order-tracking.630990",
       "caller": "gateway",
       "caller_endpoint": "GET /order-tracking/tracking/{order_id}",
       "callee": "order-tracking",
