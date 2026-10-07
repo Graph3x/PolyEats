@@ -1,4 +1,4 @@
-# PolyEats - dataset schema version 1.1.2
+# PolyEats - dataset schema version 1.1.3
 
 Specification for the published dataset: file layout, node/edge schema, enums, and serialization rules.
 
@@ -96,7 +96,7 @@ kinds that use them.
 | `caller` | string | all | node id |
 | `caller_endpoint` | string \| null | all | endpoint the call originates from |
 | `callee` | string | all | node id |
-| `callee_endpoint` | string \| null | all but destination-targeting | endpoint, or table/collection for `query` |
+| `callee_endpoint` | string \| null | all but destination-targeting | endpoint, or table / collection / key prefix for `query` |
 | `type` | enum | all | |
 | `pattern` | enum array \| null | `rest`, `grpc`, `grpc-stream` | |
 | `routing_key` | string \| null | `async` service→destination | |
@@ -186,7 +186,7 @@ This is mostly generalization readiness and primarily internal only, SAR tools a
 
 ## Operation naming
 
-Both `caller_endpoint` and `callee_endpoint` use these forms, so an edge's `callee_endpoint` matches the next edge's `caller_endpoint` by string equality. `query` edges are the exception: their `callee_endpoint` is a table or collection name, not an operation.
+Both `caller_endpoint` and `callee_endpoint` use these forms, so an edge's `callee_endpoint` matches the next edge's `caller_endpoint` by string equality. `query` edges are the exception: their `callee_endpoint` is a table or collection name, or the key prefix for a key-value store (`session` for `session:{id}`), not an operation.
 
 | Origin | Form |
 |---|---|
@@ -194,6 +194,8 @@ Both `caller_endpoint` and `callee_endpoint` use these forms, so an edge's `call
 | gRPC handler | `OrderState/Advance` |
 | WebSocket handler | `WS /telemetry` |
 | Broker consumer | `on:order.placed` |
+
+A proxied route has no handler of its own, so it uses the client-facing path of the forwarded operation: `GET /order-tracking/tracking/{order_id}`, not the catch-all `/order-tracking/`.
 
 Path parameters use **named braces** — `GET /orders/{id}`. The name is part of the stored string, and therefore of the edge-id hash, so each endpoint has exactly one spelling: use the callee's own parameter name. Query strings and fragments are excluded — they are not part of endpoint identity. gRPC forms have
 no parameters.

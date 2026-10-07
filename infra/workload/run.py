@@ -6,6 +6,10 @@ import urllib.request
 GEOCODING = "http://localhost:8000"
 ORDER_TRACKING = "http://localhost:8001"
 ADDRESS = "http://localhost:8002"
+AUTH = "http://localhost:8003"
+GATEWAY = "http://localhost:8004"
+
+CUSTOMER = {"email": "customer@polyeats.test", "password": "customer"}
 
 # Must be a row in geocoding's gazetteer, or the geocode call returns NOT_FOUND.
 SEED_ADDRESS = {
@@ -20,9 +24,11 @@ SEED_ADDRESS = {
 failures = []
 
 
-def call(method, url, body=None, expect=200):
+def call(method, url, body=None, expect=200, token=None):
     data = json.dumps(body).encode() if body is not None else None
     headers = {"Content-Type": "application/json"} if data else {}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
     request = urllib.request.Request(url, data=data, headers=headers, method=method)
 
     try:
@@ -74,7 +80,37 @@ def address():
     )
 
 
-SERVICES = [geocoding, order_tracking, address]
+def auth():
+    call("GET", f"{AUTH}/health")
+    call("GET", f"{AUTH}/.well-known/jwks.json")
+
+
+def gateway():
+    call("GET", f"{GATEWAY}/health")
+
+    call("POST", f"{GATEWAY}/auth/login", CUSTOMER | {"password": "wrong"}, expect=401)
+    tokens = call("POST", f"{GATEWAY}/auth/login", CUSTOMER)
+    if not tokens:
+        return
+    tokens = call(
+        "POST", f"{GATEWAY}/auth/refresh", {"refresh_token": tokens["refresh_token"]}
+    )
+    if not tokens:
+        return
+
+    call("GET", f"{GATEWAY}/order-tracking/tracking/1", expect=401)
+    call("GET", f"{GATEWAY}/order-tracking/tracking/1", token=tokens["access_token"])
+
+    call("POST", f"{GATEWAY}/auth/logout", {"refresh_token": tokens["refresh_token"]})
+    call(
+        "POST",
+        f"{GATEWAY}/auth/refresh",
+        {"refresh_token": tokens["refresh_token"]},
+        expect=401,
+    )
+
+
+SERVICES = [geocoding, order_tracking, address, auth, gateway]
 
 
 def main():
