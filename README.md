@@ -50,6 +50,11 @@ python grading/grader/grader.py results.json [--dbs]
 
 Datastores are ignored unless `--dbs` is passed. The grader prints the number of `correct`, `missing` and `additional` caller → callee pairs. For a reference point, [grading/baselines/baseline.py](grading/baselines/baseline.py) produces a submission with a naive grep: `python grading/baselines/baseline.py services --output results.json`.
 
+
+## Known issues
+Auth service uses a commited static private key. This is clearly not a production ready setup, but it simplifies testing and deployment.
+
+
 ## License
 
 Apache-2.0, see [LICENSE](LICENSE).
