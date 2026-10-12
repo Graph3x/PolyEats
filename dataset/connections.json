@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1.3",
+  "schema_version": "1.1.4",
   "dataset_version": null,
   "timestamp": null,
   "source": null,
@@ -184,7 +184,8 @@
       "callee_endpoint": "Geocoding/Geocode",
       "type": "grpc",
       "pattern": [
-        "literal-url"
+        "literal-url",
+        "object-state"
       ],
       "routing_key": null,
       "headers": null,
@@ -202,7 +203,8 @@
       "callee_endpoint": "Geocoding/Geocode",
       "type": "grpc",
       "pattern": [
-        "literal-url"
+        "literal-url",
+        "object-state"
       ],
       "routing_key": null,
       "headers": null,
@@ -268,7 +270,9 @@
       "callee_endpoint": "GET /.well-known/jwks.json",
       "type": "rest",
       "pattern": [
-        "env-var-config"
+        "client-wrapper",
+        "env-var-config",
+        "object-state"
       ],
       "routing_key": null,
       "headers": null,
@@ -286,6 +290,7 @@
       "callee_endpoint": "Auth/Logout",
       "type": "grpc",
       "pattern": [
+        "closure-captured",
         "env-var-config"
       ],
       "routing_key": null,
@@ -304,6 +309,7 @@
       "callee_endpoint": "Auth/Refresh",
       "type": "grpc",
       "pattern": [
+        "closure-captured",
         "env-var-config"
       ],
       "routing_key": null,
@@ -322,6 +328,7 @@
       "callee_endpoint": "Auth/Login",
       "type": "grpc",
       "pattern": [
+        "closure-captured",
         "env-var-config"
       ],
       "routing_key": null,

@@ -1,4 +1,4 @@
-# PolyEats - dataset schema version 1.1.3
+# PolyEats - dataset schema version 1.1.4
 
 Specification for the published dataset: file layout, node/edge schema, enums, and serialization rules.
 
@@ -118,7 +118,7 @@ type      rest · grpc · grpc-stream · websocket ·
 role      primary · alternate · dead-letter
 
 pattern   literal-url · string-concatenation · env-var-config ·
-          cross-file-constant · class-field-default · client-wrapper ·
+          cross-file-constant · object-state · client-wrapper ·
           conditional-branch · closure-captured · gateway-indirection ·
           lookup-table
           reserved: service-discovery-lookup

@@ -93,7 +93,7 @@ class Constants:
         "string-concatenation",
         "env-var-config",
         "cross-file-constant",
-        "class-field-default",
+        "object-state",
         "client-wrapper",
         "conditional-branch",
         "closure-captured",
