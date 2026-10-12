@@ -71,14 +71,24 @@ def forwarded_endpoints(collected, by_key, servers):
     for span in collected:
         server = enclosing_server(span, by_key)
         upstream = servers.get(span["key"])
-        if span["kind"] != CLIENT or "url.full" not in span["attributes"] or not server or not upstream:
+        if (
+            span["kind"] != CLIENT
+            or "url.full" not in span["attributes"]
+            or not server
+            or not upstream
+        ):
             continue
         method, _, route = endpoint(server).partition(" ")
         if not route.endswith("/"):
             continue
         prefix = route.removesuffix("/")
-        if server["attributes"].get("url.path") == prefix + urlsplit(span["attributes"]["url.full"]).path:
-            renamed[server["key"]] = f"{method} {prefix}{endpoint(upstream).partition(' ')[2]}"
+        if (
+            server["attributes"].get("url.path")
+            == prefix + urlsplit(span["attributes"]["url.full"]).path
+        ):
+            renamed[server["key"]] = (
+                f"{method} {prefix}{endpoint(upstream).partition(' ')[2]}"
+            )
     return renamed
 
 
