@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"time"
@@ -33,7 +34,11 @@ func authRoute[Req, Resp proto.Message](newReq func() Req, call func(context.Con
 			err = protojson.Unmarshal(body, req)
 		}
 		if err != nil {
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			code := http.StatusBadRequest
+			if _, ok := errors.AsType[*http.MaxBytesError](err); ok {
+				code = http.StatusRequestEntityTooLarge
+			}
+			http.Error(w, http.StatusText(code), code)
 			return
 		}
 
