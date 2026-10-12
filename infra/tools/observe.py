@@ -4,6 +4,7 @@ import re
 import sys
 from collections.abc import Generator
 from typing import Any
+from urllib.parse import urlsplit
 
 import canonicalise
 from schema_constants import Constants
@@ -65,6 +66,22 @@ def enclosing_server(span, by_key):
     return span
 
 
+def forwarded_endpoints(collected, by_key, servers):
+    renamed = {}
+    for span in collected:
+        server = enclosing_server(span, by_key)
+        upstream = servers.get(span["key"])
+        if span["kind"] != CLIENT or "url.full" not in span["attributes"] or not server or not upstream:
+            continue
+        method, _, route = endpoint(server).partition(" ")
+        if not route.endswith("/"):
+            continue
+        prefix = route.removesuffix("/")
+        if server["attributes"].get("url.path") == prefix + urlsplit(span["attributes"]["url.full"]).path:
+            renamed[server["key"]] = f"{method} {prefix}{endpoint(upstream).partition(' ')[2]}"
+    return renamed
+
+
 def table(attrs):
     name = attrs.get("db.collection.name") or attrs.get("db.sql.table")
     if name:
@@ -91,6 +108,7 @@ def observed_edges(path: str, kinds: dict):
     collected = list(spans(path))
     by_key = {span["key"]: span for span in collected}
     servers = {span["parent"]: span for span in collected if span["kind"] == SERVER}
+    forwarded = forwarded_endpoints(collected, by_key, servers)
 
     edges = {}
     undeclared = set()
@@ -110,7 +128,7 @@ def observed_edges(path: str, kinds: dict):
         edge = dict.fromkeys(Constants.EDGE_KEYS)
         edge |= {
             "caller": client_span["service"],
-            "caller_endpoint": endpoint(server),
+            "caller_endpoint": forwarded.get(server["key"]) or endpoint(server),
             "callee": callee_node,
             "callee_endpoint": callee_endpoint,
             "type": edge_type,
