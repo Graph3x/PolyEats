@@ -190,12 +190,17 @@ def main():
     with open(arguments.connections, "w") as destination:
         destination.write(formatter.serialise())
 
+    mismatched = False
     for edge in data["edges"]:
         if not edge["observed"]:
             print(f"static only:  {edge['id']}")
+            mismatched = True
         elif not edge["static"]:
             print(f"runtime only: {edge['id']}")
+            mismatched = True
     print(f"{len(observed)} edges observed")
+    if mismatched:
+        sys.exit("static and observed edges differ")
 
 
 if __name__ == "__main__":
