@@ -54,6 +54,8 @@ Datastores are ignored unless `--dbs` is passed. The grader prints the number of
 ## Known issues
 Auth service uses a commited static private key. This is clearly not a production ready setup, but it simplifies testing and deployment.
 
+gRPC clients use the default `pick_first` load balancing, so each client sends all of its traffic to a single replica of a scaled service. This doesn't matter for the current single-instance setup.
+
 
 ## License
 
