@@ -153,7 +153,8 @@ func main() {
 		log.Fatalf("build jwks: %v", err)
 	}
 
-	store, err := valkeyotel.NewClient(valkey.ClientOption{InitAddress: []string{os.Getenv("VALKEY_ADDR")}})
+	store, err := valkeyotel.NewClient(valkey.ClientOption{InitAddress: []string{os.Getenv("VALKEY_ADDR")}},
+		valkeyotel.WithDBStatement(func(cmd []string) string { return strings.Join(cmd[:min(len(cmd), 2)], " ") }))
 	if err != nil {
 		log.Fatalf("connect valkey: %v", err)
 	}

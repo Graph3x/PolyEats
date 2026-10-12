@@ -93,6 +93,9 @@ def forwarded_endpoints(collected, by_key, servers):
 
 
 def table(attrs):
+    if attrs.get("db.system") == "valkey":
+        key = (attrs.get("db.statement") or "").partition(" ")[2]
+        return key.split(":")[0] or None
     name = attrs.get("db.collection.name") or attrs.get("db.sql.table")
     if name:
         return name
