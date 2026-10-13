@@ -4,6 +4,12 @@ A polyglot (Go, Java, Python) microservices benchmark for software architecture 
 Ground truth ships as an annotated dependency graph: services, datastores and message destinations as nodes, typed endpoint-level edges labelled with the SAR pattern that obscures them and whether each is statically resolvable and/or observed at runtime. See [dataset/dataset-schema.md](dataset/dataset-schema.md).
 A grader in [grading/](grading/) scores tool output against it.
 
+## Proposed architecture
+
+![Proposed PolyEats architecture](docs/PolyEats.drawio.svg)
+
+The diagram shows the target system. Not all services are implemented yet; the published dataset describes the current state.
+
 ## Layout
 
 | Path | Contents |
@@ -13,6 +19,7 @@ A grader in [grading/](grading/) scores tool output against it.
 | `grading/` | Grader and naive baseline |
 | `infra/` | Tooling (release stamping, canonicalisation) |
 | `proto/` | gRPC definitions |
+| `docs/` | Documentation and diagrams |
 
 ## Running it
 
