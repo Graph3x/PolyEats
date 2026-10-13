@@ -1,6 +1,8 @@
 # PolyEats
 
-A polyglot (Go, Java, Python) microservices benchmark for  software architecture recovery (SAR) tools, built around a food-delivery system. Ground truth ships as an annotated dependency graph: services, datastores and message destinations as nodes, typed endpoint-level edges labelled with the SAR pattern that obscures them and whether each is statically resolvable and/or observed at runtime. See [dataset/dataset-schema.md](dataset/dataset-schema.md). A grader in [grading/](grading/) scores tool output against it.
+A polyglot (Go, Java, Python) microservices benchmark for software architecture recovery (SAR) tools, built around a food-delivery system.
+Ground truth ships as an annotated dependency graph: services, datastores and message destinations as nodes, typed endpoint-level edges labelled with the SAR pattern that obscures them and whether each is statically resolvable and/or observed at runtime. See [dataset/dataset-schema.md](dataset/dataset-schema.md).
+A grader in [grading/](grading/) scores tool output against it.
 
 ## Layout
 
@@ -52,8 +54,17 @@ Datastores are ignored unless `--dbs` is passed. The grader prints the number of
 
 
 ## Known issues
-Auth service uses a commited static private key. This is clearly not a production ready setup, but it simplifies testing and deployment.
 
+### Unusual call patterns
+This project's main purpose is to test SAR tools and approaches, so some service calls are deliberately obfuscated. Each obfuscation is realistic on its own, but may be used in an unusual way.
+
+### Missing TLS
+The project currently doesn't encrypt its traffic with TLS.
+
+### Committed private key
+The auth service uses a committed static private key. This is clearly not a production-ready setup, but it simplifies testing and deployment.
+
+### gRPC load balancing
 gRPC clients use the default `pick_first` load balancing, so each client sends all of its traffic to a single replica of a scaled service. This doesn't matter for the current single-instance setup.
 
 
