@@ -52,6 +52,22 @@ python grading/grader/grader.py results.json [--dbs]
 
 Datastores are ignored unless `--dbs` is passed. The grader prints the number of `correct`, `missing` and `additional` caller → callee pairs. For a reference point, [grading/baselines/baseline.py](grading/baselines/baseline.py) produces a submission with a naive grep: `python grading/baselines/baseline.py services --output results.json`.
 
+## Roadmap
+
+### Near term
+- The complete synchronous core: the customer, restaurant and courier domains.
+- A first end-to-end asynchronous edge: RabbitMQ publish and consume, with trace context carried in the message.
+- Authentication between all services.
+
+### Toward 1.0
+- Event-driven communication across the system, with ground truth and runtime trace verification for message-based edges.
+- Endpoint-level and per-pattern scoring in the grader.
+- Ground truth checked by an independent second rater.
+- A realistic workload generator for collecting runtime data.
+
+### 1.0 and beyond
+- A stable, citable release archived on Zenodo.
+- Reference results for existing architecture recovery tools.
 
 ## Known issues
 
