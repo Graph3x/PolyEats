@@ -18,13 +18,7 @@ jobs:
           python-version: "3.12"
 
       - name: start the containers
-        run: docker compose up -d --build
-
-      - name: wait for services
-        run: |
-          for port in 8000 8001 8002; do
-            timeout 300 bash -c "until curl -sf localhost:$port/health > /dev/null; do sleep 2; done"
-          done
+        run: docker compose up -d --build --wait --wait-timeout 300
 
       - name: run the testing workload
         run: python infra/workload/run.py

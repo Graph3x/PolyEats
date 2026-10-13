@@ -12,6 +12,15 @@ x-otel: &otel
 x-jwks: &jwks
   JWKS_URL: http://auth:8080/.well-known/jwks.json
 
+x-healthcheck: &healthcheck
+  test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+  interval: 30s
+  timeout: 3s
+  retries: 3
+  start_period: 60s
+  start_interval: 3s
+
+
 services:
   polyeats-init:
     image: busybox:1.37
@@ -67,6 +76,7 @@ services:
       AUTH_ADDR: auth:9090
     ports:
       - "8004:8080" # REST
+    healthcheck: *healthcheck
     networks:
       - polyeats
 
@@ -79,6 +89,7 @@ services:
     ports:
       - "8000:8080" # REST
       - "9000:9090" # gRPC
+    healthcheck: *healthcheck
     networks:
       - polyeats
 
@@ -90,6 +101,7 @@ services:
       GEOCODING_ADDR: geocoding:9090
     ports:
       - "8001:8080" # REST
+    healthcheck: *healthcheck
     networks:
       - polyeats
 
@@ -106,6 +118,7 @@ services:
       POSTGRES_PASSWORD: polyeats
     ports:
       - "8002:8080" # REST
+    healthcheck: *healthcheck
     networks:
       - polyeats
 
@@ -135,5 +148,6 @@ services:
     ports:
       - "8003:8080" # REST
       - "9003:9090" # gRPC
+    healthcheck: *healthcheck
     networks:
       - polyeats
