@@ -83,7 +83,7 @@ services:
   geocoding:
     build: ./services/geocoding
     environment:
-      <<: *otel
+      <<: [*otel, *jwks]
       OTEL_SERVICE_NAME: geocoding
       GEO_DB_PATH: /data/geo.db
     ports:

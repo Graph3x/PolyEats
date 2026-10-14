@@ -100,7 +100,9 @@ func main() {
 		log.Fatalf("grpc listen: %v", err)
 	}
 
-	grpcServer := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()))
+	grpcServer := grpc.NewServer(
+		grpc.StatsHandler(otelgrpc.NewServerHandler()),
+		grpc.UnaryInterceptor(newVerifier(os.Getenv("JWKS_URL")).unaryInterceptor))
 	pb.RegisterGeocodingServer(grpcServer, &geocodingServer{db: db})
 
 	mux := http.NewServeMux()
