@@ -25,6 +25,7 @@ const (
 	jwtIssuer       = "auth"
 	jwksCacheTTL    = time.Hour
 	jwksRefetchWait = 10 * time.Second
+	jwksStaleGrace  = 5 * time.Minute
 )
 
 var (
@@ -87,7 +88,7 @@ func (v *verifier) verify(ctx context.Context, authorization string) (*claims, e
 	return c, err
 }
 
-// A stale key is still served when a refetch fails, so an auth outage does not reject valid tokens.
+// A stale key is still served for jwksStaleGrace past the TTL when a refetch fails, so a short auth outage does not reject valid tokens.
 func (v *verifier) key(ctx context.Context, kid string) (*rsa.PublicKey, error) {
 	v.mu.Lock()
 	defer v.mu.Unlock()
@@ -105,7 +106,7 @@ func (v *verifier) key(ctx context.Context, kid string) (*rsa.PublicKey, error) 
 			key, known = keys[kid]
 		}
 	}
-	if known {
+	if known && time.Since(v.fetchedAt) < jwksCacheTTL+jwksStaleGrace {
 		return key, nil
 	}
 	if v.fetchErr != nil {
