@@ -90,6 +90,9 @@ The auth service uses a committed static private key. This is clearly not a prod
 ### gRPC load balancing
 gRPC clients use the default `pick_first` load balancing, so each client sends all of its traffic to a single replica of a scaled service. This doesn't matter for the current single-instance setup.
 
+### Code duplication
+Some code, such as the JWT verifier, is deliberately copied into each service instead of shared as a library. Every service then makes the call itself, which gives more and more varied edges than a single shared implementation would. The copies have to be kept in sync by hand.
+
 
 ## License
 
