@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -35,25 +36,31 @@ type claims struct {
 	jwt.RegisteredClaims
 }
 
+type keySet struct {
+	keys      map[string]*rsa.PublicKey
+	fetchedAt time.Time
+}
+
 type verifier struct {
 	jwksURL string
 	client  *http.Client
+	set     atomic.Pointer[keySet]
 
 	mu          sync.Mutex
-	keys        map[string]*rsa.PublicKey
-	fetchedAt   time.Time
 	attemptedAt time.Time
 	fetchErr    error
 }
 
 func newVerifier(jwksURL string) *verifier {
-	return &verifier{
+	v := &verifier{
 		jwksURL: jwksURL,
 		client: &http.Client{
 			Timeout:   5 * time.Second,
 			Transport: otelhttp.NewTransport(http.DefaultTransport),
 		},
 	}
+	v.set.Store(&keySet{})
+	return v
 }
 
 func (v *verifier) middleware(next http.Handler) http.Handler {
@@ -87,11 +94,18 @@ func (v *verifier) verify(ctx context.Context, authorization string) (*claims, e
 
 // A stale key is still served for jwksStaleGrace past the TTL when a refetch fails, so a short auth outage does not reject valid tokens.
 func (v *verifier) key(ctx context.Context, kid string) (*rsa.PublicKey, error) {
+	set := v.set.Load()
+	key, known := set.keys[kid]
+	if known && time.Since(set.fetchedAt) < jwksCacheTTL {
+		return key, nil
+	}
+
 	v.mu.Lock()
 	defer v.mu.Unlock()
 
-	key, known := v.keys[kid]
-	if known && time.Since(v.fetchedAt) < jwksCacheTTL {
+	set = v.set.Load()
+	key, known = set.keys[kid]
+	if known && time.Since(set.fetchedAt) < jwksCacheTTL {
 		return key, nil
 	}
 	if time.Since(v.attemptedAt) >= jwksRefetchWait {
@@ -99,11 +113,12 @@ func (v *verifier) key(ctx context.Context, kid string) (*rsa.PublicKey, error) 
 		keys, err := v.fetch(ctx)
 		v.fetchErr = err
 		if err == nil {
-			v.keys, v.fetchedAt = keys, time.Now()
+			set = &keySet{keys: keys, fetchedAt: time.Now()}
+			v.set.Store(set)
 			key, known = keys[kid]
 		}
 	}
-	if known && time.Since(v.fetchedAt) < jwksCacheTTL+jwksStaleGrace {
+	if known && time.Since(set.fetchedAt) < jwksCacheTTL+jwksStaleGrace {
 		return key, nil
 	}
 	if v.fetchErr != nil {
