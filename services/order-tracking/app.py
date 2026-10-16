@@ -3,8 +3,9 @@ import os
 import geocoding_pb2
 import geocoding_pb2_grpc
 import uvicorn
+from auth import verify
 from clients import grpc_channel
-from fastapi import FastAPI, Response
+from fastapi import Depends, FastAPI, Response
 
 TIMEOUT = 5.0
 
@@ -21,12 +22,14 @@ def health():
 
 
 @app.get("/tracking/{order_id}")
-def tracking(order_id: str):
+def tracking(order_id: str, authorization: str = Depends(verify)):
     latitude, longitude = COURIER_POSITION
     request = geocoding_pb2.ReverseGeocodeRequest(
         coordinates=geocoding_pb2.Coordinates(lat=latitude, lon=longitude)
     )
-    address = geocoding.ReverseGeocode(request, timeout=TIMEOUT).address
+    address = geocoding.ReverseGeocode(
+        request, timeout=TIMEOUT, metadata=[("authorization", authorization)]
+    ).address
     return {
         "orderId": order_id,
         "courierLocation": {

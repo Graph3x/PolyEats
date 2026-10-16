@@ -96,7 +96,7 @@ services:
   order-tracking:
     build: ./services/order-tracking
     environment:
-      <<: *otel
+      <<: [*otel, *jwks]
       OTEL_SERVICE_NAME: order-tracking
       GEOCODING_ADDR: geocoding:9090
     ports:
