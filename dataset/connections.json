@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1.4",
+  "schema_version": "1.2.0",
   "dataset_version": null,
   "timestamp": null,
   "source": null,
@@ -96,6 +96,24 @@
     }
   ],
   "edges": [
+    {
+      "id": "address.auth.997ab8",
+      "caller": "address",
+      "caller_endpoint": null,
+      "callee": "auth",
+      "callee_endpoint": "GET /.well-known/jwks.json",
+      "type": "rest",
+      "pattern": [
+        "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
     {
       "id": "address.db:address.811be3",
       "caller": "address",
@@ -263,26 +281,6 @@
       "observed": false
     },
     {
-      "id": "gateway.auth.170744",
-      "caller": "gateway",
-      "caller_endpoint": "GET /order-tracking/tracking/{order_id}",
-      "callee": "auth",
-      "callee_endpoint": "GET /.well-known/jwks.json",
-      "type": "rest",
-      "pattern": [
-        "client-wrapper",
-        "env-var-config",
-        "object-state"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
       "id": "gateway.auth.4d165d",
       "caller": "gateway",
       "caller_endpoint": "POST /auth/logout",
@@ -311,6 +309,26 @@
       "pattern": [
         "closure-captured",
         "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.auth.997ab8",
+      "caller": "gateway",
+      "caller_endpoint": null,
+      "callee": "auth",
+      "callee_endpoint": "GET /.well-known/jwks.json",
+      "type": "rest",
+      "pattern": [
+        "client-wrapper",
+        "env-var-config",
+        "object-state"
       ],
       "routing_key": null,
       "headers": null,
@@ -359,6 +377,26 @@
       "observed": false
     },
     {
+      "id": "geocoding.auth.997ab8",
+      "caller": "geocoding",
+      "caller_endpoint": null,
+      "callee": "auth",
+      "callee_endpoint": "GET /.well-known/jwks.json",
+      "type": "rest",
+      "pattern": [
+        "client-wrapper",
+        "env-var-config",
+        "object-state"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
       "id": "geocoding.db:geocoding.9f4a45",
       "caller": "geocoding",
       "caller_endpoint": "Geocoding/ReverseGeocode",
@@ -382,6 +420,24 @@
       "callee_endpoint": "addresses",
       "type": "query",
       "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "order-tracking.auth.997ab8",
+      "caller": "order-tracking",
+      "caller_endpoint": null,
+      "callee": "auth",
+      "callee_endpoint": "GET /.well-known/jwks.json",
+      "type": "rest",
+      "pattern": [
+        "env-var-config"
+      ],
       "routing_key": null,
       "headers": null,
       "selector": null,
