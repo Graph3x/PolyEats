@@ -102,3 +102,4 @@ class Constants:
         "service-discovery-lookup",
     }
     PATTERN_TYPES: typing.ClassVar = {"rest", "grpc", "grpc-stream"}
+    SERVICE_WIDE: typing.ClassVar = {("auth", "GET /.well-known/jwks.json")}

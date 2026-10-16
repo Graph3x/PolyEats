@@ -3,7 +3,7 @@ import json
 import sys
 from pathlib import Path
 
-VERSION = "1.1.4"
+VERSION = "1.2.0"
 
 
 class SchemaException(Exception):

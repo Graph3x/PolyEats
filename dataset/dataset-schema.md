@@ -1,4 +1,4 @@
-# PolyEats - dataset schema version 1.1.4
+# PolyEats - dataset schema version 1.2.0
 
 Specification for the published dataset: file layout, node/edge schema, enums, and serialization rules.
 
@@ -36,6 +36,8 @@ Specification for the published dataset: file layout, node/edge schema, enums, a
 **Instance normalization.** Replica identity is stripped from traces, a node is a service, never one instance of it.
 
 **Derived edges.** There is always at most a single async-derived edge between two services in each direction - no matter how many different async edges it could be derived from.
+
+**Service-wide edges.** Some calls are made by service-wide machinery (a middleware, an interceptor or the framework) rather than by a handler, and any of the service's endpoints can trigger them. These edges carry `caller_endpoint: null`, so a service has at most one such edge per callee endpoint. Currently this covers JWKS key fetches (`GET /.well-known/jwks.json` on `auth`).
 
 ---
 
@@ -94,7 +96,7 @@ kinds that use them.
 |---|---|---|---|
 | `id` | string | all | see [Edge ids](#edge-ids) |
 | `caller` | string | all | node id |
-| `caller_endpoint` | string \| null | all | endpoint the call originates from |
+| `caller_endpoint` | string \| null | all | endpoint the call originates from; null for service-wide edges |
 | `callee` | string | all | node id |
 | `callee_endpoint` | string \| null | all but destination-targeting | endpoint, or table / collection / key prefix for `query` |
 | `type` | enum | all | |

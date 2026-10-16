@@ -141,7 +141,9 @@ def observed_edges(path: str, kinds: dict):
         edge = dict.fromkeys(Constants.EDGE_KEYS)
         edge |= {
             "caller": client_span["service"],
-            "caller_endpoint": forwarded.get(server["key"]) or endpoint(server),
+            "caller_endpoint": None
+            if (callee_node, callee_endpoint) in Constants.SERVICE_WIDE
+            else forwarded.get(server["key"]) or endpoint(server),
             "callee": callee_node,
             "callee_endpoint": callee_endpoint,
             "type": edge_type,
