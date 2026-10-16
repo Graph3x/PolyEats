@@ -48,35 +48,48 @@ def call(method, url, body=None, expect=200, token=None):
     return json.loads(payload) if payload.startswith(b"{") else None
 
 
+def login():
+    return call("POST", f"{GATEWAY}/auth/login", CUSTOMER)
+
+
 def geocoding():
     call("GET", f"{GEOCODING}/health")
 
 
 def order_tracking():
     call("GET", f"{ORDER_TRACKING}/health")
-    call("GET", f"{ORDER_TRACKING}/tracking/1")
 
 
 def address():
     call("GET", f"{ADDRESS}/health")
 
-    created = call("POST", f"{ADDRESS}/addresses", SEED_ADDRESS)
+    tokens = login()
+    if not tokens:
+        return
+    token = tokens["access_token"]
+
+    created = call("POST", f"{ADDRESS}/addresses", SEED_ADDRESS, token=token)
     if not created:
         return
     created_id = created["id"]
 
-    call("GET", f"{ADDRESS}/addresses/{created_id}")
-    call("GET", f"{ADDRESS}/addresses?ownerType=user&ownerId=1")
+    call("GET", f"{ADDRESS}/addresses/{created_id}", token=token)
+    call("GET", f"{ADDRESS}/addresses?ownerType=user&ownerId=1", token=token)
     call(
         "PUT",
         f"{ADDRESS}/addresses/{created_id}",
         SEED_ADDRESS | {"street": "Kostelni", "buildingNumber": "3"},
+        token=token,
     )
-    call("DELETE", f"{ADDRESS}/addresses/{created_id}")
+    call("DELETE", f"{ADDRESS}/addresses/{created_id}", token=token)
 
-    call("GET", f"{ADDRESS}/addresses/{created_id}", expect=404)
+    call("GET", f"{ADDRESS}/addresses/{created_id}", expect=404, token=token)
     call(
-        "POST", f"{ADDRESS}/addresses", SEED_ADDRESS | {"street": "Nowhere"}, expect=422
+        "POST",
+        f"{ADDRESS}/addresses",
+        SEED_ADDRESS | {"street": "Nowhere"},
+        expect=422,
+        token=token,
     )
 
 
@@ -89,7 +102,7 @@ def gateway():
     call("GET", f"{GATEWAY}/health")
 
     call("POST", f"{GATEWAY}/auth/login", CUSTOMER | {"password": "wrong"}, expect=401)
-    tokens = call("POST", f"{GATEWAY}/auth/login", CUSTOMER)
+    tokens = login()
     if not tokens:
         return
     tokens = call(

@@ -111,7 +111,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      <<: *otel
+      <<: [*otel, *jwks]
       OTEL_SERVICE_NAME: address
       POSTGRES_URL: jdbc:postgresql://postgres:5432/address
       POSTGRES_USER: polyeats
