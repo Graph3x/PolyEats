@@ -69,6 +69,7 @@ class AddressController {
 
     @PutMapping("/addresses/{id}")
     Address update(@PathVariable Long id, @RequestBody Address address) {
+        byId(id);
         Coordinates coordinates = resolve(address);
         jdbc.update(
                 "UPDATE addresses SET owner_type = ?, owner_id = ?, street = ?, building_number = ?, "
