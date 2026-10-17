@@ -3,7 +3,6 @@ package com.polyeats.address;
 import com.polyeats.geocoding.Coordinates;
 import com.polyeats.geocoding.GeocodeRequest;
 import com.polyeats.geocoding.GeocodingGrpc;
-import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -91,9 +90,11 @@ class AddressController {
 
     @ExceptionHandler(StatusRuntimeException.class)
     ResponseEntity<Void> geocodingFailed(StatusRuntimeException e) {
-        return ResponseEntity.status(e.getStatus().getCode() == Status.Code.NOT_FOUND
-                ? HttpStatus.UNPROCESSABLE_ENTITY
-                : HttpStatus.BAD_GATEWAY).build();
+        return ResponseEntity.status(switch (e.getStatus().getCode()) {
+            case NOT_FOUND -> HttpStatus.UNPROCESSABLE_ENTITY;
+            case DEADLINE_EXCEEDED -> HttpStatus.GATEWAY_TIMEOUT;
+            default -> HttpStatus.BAD_GATEWAY;
+        }).build();
     }
 
     private Coordinates resolve(Address address) {
