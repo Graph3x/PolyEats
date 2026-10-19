@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 class AddressController {
@@ -43,7 +46,8 @@ class AddressController {
     }
 
     @PostMapping("/addresses")
-    Address create(@RequestBody Address address) {
+    Address create(@AuthenticationPrincipal Jwt jwt, @RequestBody Address address) {
+        requireOwner(jwt, address.ownerId());
         Coordinates coordinates = resolve(address);
         Long id = jdbc.queryForObject(
                 "INSERT INTO addresses (owner_type, owner_id, street, building_number, city, postal_code, lat, lon) "
@@ -67,8 +71,9 @@ class AddressController {
     }
 
     @PutMapping("/addresses/{id}")
-    Address update(@PathVariable Long id, @RequestBody Address address) {
-        byId(id);
+    Address update(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id, @RequestBody Address address) {
+        requireOwner(jwt, byId(id).ownerId());
+        requireOwner(jwt, address.ownerId());
         Coordinates coordinates = resolve(address);
         jdbc.update(
                 "UPDATE addresses SET owner_type = ?, owner_id = ?, street = ?, building_number = ?, "
@@ -79,8 +84,15 @@ class AddressController {
     }
 
     @DeleteMapping("/addresses/{id}")
-    void delete(@PathVariable Long id) {
+    void delete(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id) {
+        requireOwner(jwt, byId(id).ownerId());
         jdbc.update("DELETE FROM addresses WHERE id = ?", id);
+    }
+
+    private static void requireOwner(Jwt jwt, String ownerId) {
+        if (!jwt.getSubject().equals(ownerId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
     }
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
