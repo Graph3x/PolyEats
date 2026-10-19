@@ -1,5 +1,5 @@
 CREATE TABLE users (
-  id    BIGSERIAL PRIMARY KEY,
-  name  TEXT NOT NULL,
-  email TEXT NOT NULL UNIQUE
+  account_id TEXT PRIMARY KEY,
+  name       TEXT NOT NULL,
+  email      TEXT NOT NULL UNIQUE
 );
