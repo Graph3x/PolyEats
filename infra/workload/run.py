@@ -8,13 +8,15 @@ ORDER_TRACKING = "http://localhost:8001"
 ADDRESS = "http://localhost:8002"
 AUTH = "http://localhost:8003"
 GATEWAY = "http://localhost:8004"
+USER = "http://localhost:8005"
 
 CUSTOMER = {"email": "customer@polyeats.test", "password": "customer"}
+CUSTOMER_ID = "acc-customer"
 
 # Must be a row in geocoding's gazetteer, or the geocode call returns NOT_FOUND.
 SEED_ADDRESS = {
     "ownerType": "user",
-    "ownerId": "1",
+    "ownerId": CUSTOMER_ID,
     "street": "Skolni",
     "buildingNumber": "2",
     "city": "Krecovice",
@@ -68,29 +70,60 @@ def address():
         return
     token = tokens["access_token"]
 
-    created = call("POST", f"{ADDRESS}/addresses", SEED_ADDRESS, token=token)
+    addresses = f"{GATEWAY}/address/addresses"
+    created = call("POST", addresses, SEED_ADDRESS, token=token)
     if not created:
         return
     created_id = created["id"]
 
-    call("GET", f"{ADDRESS}/addresses/{created_id}", token=token)
-    call("GET", f"{ADDRESS}/addresses?ownerType=user&ownerId=1", token=token)
+    call("GET", f"{addresses}/{created_id}", token=token)
+    call("GET", f"{addresses}?ownerType=user&ownerId={CUSTOMER_ID}", token=token)
     call(
         "PUT",
-        f"{ADDRESS}/addresses/{created_id}",
+        f"{addresses}/{created_id}",
         SEED_ADDRESS | {"street": "Kostelni", "buildingNumber": "3"},
         token=token,
     )
-    call("DELETE", f"{ADDRESS}/addresses/{created_id}", token=token)
+    call("DELETE", f"{addresses}/{created_id}", token=token)
 
-    call("GET", f"{ADDRESS}/addresses/{created_id}", expect=404, token=token)
+    call("GET", f"{addresses}/{created_id}", expect=404, token=token)
     call(
         "POST",
-        f"{ADDRESS}/addresses",
+        addresses,
         SEED_ADDRESS | {"street": "Nowhere"},
         expect=422,
         token=token,
     )
+    call(
+        "POST",
+        addresses,
+        SEED_ADDRESS | {"ownerId": "acc-other"},
+        expect=403,
+        token=token,
+    )
+
+
+def user():
+    call("GET", f"{USER}/health")
+
+    tokens = login()
+    if not tokens:
+        return
+    token = tokens["access_token"]
+
+    users = f"{GATEWAY}/user/users"
+    me = f"{users}/{CUSTOMER_ID}"
+    profile = {"name": "Customer", "email": CUSTOMER["email"]}
+
+    call("POST", users, profile, token=token)
+    call("POST", users, profile, expect=409, token=token)
+    call("GET", me, token=token)
+    call("PUT", me, profile | {"name": "Renamed"}, token=token)
+    call("PUT", f"{users}/acc-other", profile, expect=403, token=token)
+    call("GET", f"{me}/addresses", token=token)
+    call("DELETE", me, token=token)
+
+    call("GET", me, expect=404, token=token)
 
 
 def auth():
@@ -123,7 +156,7 @@ def gateway():
     )
 
 
-SERVICES = [geocoding, order_tracking, address, auth, gateway]
+SERVICES = [geocoding, order_tracking, address, user, auth, gateway]
 
 
 def main():
