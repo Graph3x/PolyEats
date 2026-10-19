@@ -59,7 +59,9 @@ services:
       POSTGRES_USER: polyeats
       POSTGRES_PASSWORD: polyeats
     volumes:
-      - ./services/address/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - ./infra/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./services/address/db/schema.sql:/schemas/address.sql:ro
+      - ./services/user/db/schema.sql:/schemas/user.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U polyeats -d address"]
       interval: 5s
@@ -118,6 +120,23 @@ services:
       POSTGRES_PASSWORD: polyeats
     ports:
       - "8002:8080" # REST
+    healthcheck: *healthcheck
+    networks:
+      - polyeats
+
+  user:
+    build: ./services/user
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: [*otel, *jwks]
+      OTEL_SERVICE_NAME: user
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/user
+      POSTGRES_USER: polyeats
+      POSTGRES_PASSWORD: polyeats
+    ports:
+      - "8005:8080" # REST
     healthcheck: *healthcheck
     networks:
       - polyeats
