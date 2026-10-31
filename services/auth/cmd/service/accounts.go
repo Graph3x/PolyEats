@@ -1,8 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
 )
 
 var (
@@ -11,7 +17,7 @@ var (
 )
 
 type accountIdentity struct {
-	AccountID string `json:"account_id"`
+	AccountID string `json:"accountId"`
 	Role      string `json:"role"`
 	Epoch     int64  `json:"epoch"`
 }
@@ -21,31 +27,61 @@ type accountState struct {
 	Epoch int64  `json:"epoch"`
 }
 
-// TODO: replace with HTTP calls to account (s.account, s.accountURL) once it exists.
-var hardcodedAccounts = []struct {
-	email    string
-	password string
-	identity accountIdentity
-}{
-	{"customer@polyeats.test", "customer", accountIdentity{"acc-customer", "customer", 1}},
-	{"restaurant@polyeats.test", "restaurant", accountIdentity{"acc-restaurant", "restaurant", 1}},
-	{"courier@polyeats.test", "courier", accountIdentity{"acc-courier", "courier", 1}},
-}
-
 func (s *authServer) verifyCredentials(ctx context.Context, email, password string) (accountIdentity, error) {
-	for _, a := range hardcodedAccounts {
-		if a.email == email && a.password == password {
-			return a.identity, nil
-		}
+	var identity accountIdentity
+	code, err := s.callAccount(ctx, http.MethodPost, "/accounts/verify", map[string]string{"email": email, "password": password}, &identity)
+	switch {
+	case err != nil:
+		return identity, err
+	case code == http.StatusUnauthorized:
+		return identity, errInvalidCredentials
+	case code != http.StatusOK:
+		return identity, fmt.Errorf("account verify: status %d", code)
 	}
-	return accountIdentity{}, errInvalidCredentials
+	return identity, nil
 }
 
 func (s *authServer) getAccountState(ctx context.Context, accountID string) (accountState, error) {
-	for _, a := range hardcodedAccounts {
-		if a.identity.AccountID == accountID {
-			return accountState{Role: a.identity.Role, Epoch: a.identity.Epoch}, nil
-		}
+	var state accountState
+	code, err := s.callAccount(ctx, http.MethodGet, "/accounts/"+url.PathEscape(accountID)+"/state", nil, &state)
+	switch {
+	case err != nil:
+		return state, err
+	case code == http.StatusNotFound:
+		return state, errAccountNotFound
+	case code != http.StatusOK:
+		return state, fmt.Errorf("account state: status %d", code)
 	}
-	return accountState{}, errAccountNotFound
+	return state, nil
+}
+
+func (s *authServer) callAccount(ctx context.Context, method, path string, body, out any) (int, error) {
+	var reader io.Reader
+	if body != nil {
+		b, err := json.Marshal(body)
+		if err != nil {
+			return 0, err
+		}
+		reader = bytes.NewReader(b)
+	}
+	req, err := http.NewRequestWithContext(ctx, method, s.accountURL+path, reader)
+	if err != nil {
+		return 0, err
+	}
+	token, err := s.keys.issueAccessToken("auth", "service")
+	if err != nil {
+		return 0, err
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.account.Do(req)
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return resp.StatusCode, nil
+	}
+	return resp.StatusCode, json.NewDecoder(resp.Body).Decode(out)
 }
