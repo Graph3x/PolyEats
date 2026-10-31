@@ -116,8 +116,8 @@ services:
       <<: [*otel, *jwks]
       OTEL_SERVICE_NAME: address
       POSTGRES_URL: jdbc:postgresql://postgres:5432/address
-      POSTGRES_USER: polyeats
-      POSTGRES_PASSWORD: polyeats
+      POSTGRES_USER: address
+      POSTGRES_PASSWORD: address
     ports:
       - "8002:8080" # REST
     healthcheck: *healthcheck
@@ -133,8 +133,8 @@ services:
       <<: [*otel, *jwks]
       OTEL_SERVICE_NAME: user
       POSTGRES_URL: jdbc:postgresql://postgres:5432/user
-      POSTGRES_USER: polyeats
-      POSTGRES_PASSWORD: polyeats
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user
     ports:
       - "8005:8080" # REST
     healthcheck: *healthcheck
@@ -150,8 +150,8 @@ services:
       <<: [*otel, *jwks]
       OTEL_SERVICE_NAME: restaurant
       POSTGRES_URL: jdbc:postgresql://postgres:5432/restaurant
-      POSTGRES_USER: polyeats
-      POSTGRES_PASSWORD: polyeats
+      POSTGRES_USER: restaurant
+      POSTGRES_PASSWORD: restaurant
     ports:
       - "8006:8080" # REST
     healthcheck: *healthcheck
