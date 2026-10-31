@@ -1,4 +1,4 @@
-package com.polyeats.user;
+package com.polyeats.restaurant;
 
 import java.time.Duration;
 import java.util.List;

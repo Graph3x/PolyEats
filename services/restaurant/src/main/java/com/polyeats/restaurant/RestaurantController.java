@@ -1,4 +1,4 @@
-package com.polyeats.user;
+package com.polyeats.restaurant;
 
 import java.net.SocketTimeoutException;
 import java.net.http.HttpTimeoutException;
@@ -25,7 +25,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-class UserController {
+class RestaurantController {
 
     record User(String accountId, String name, String email) {
     }
@@ -33,7 +33,7 @@ class UserController {
     private final JdbcTemplate jdbc;
     private final AddressClient addresses;
 
-    UserController(JdbcTemplate jdbc, AddressClient addresses) {
+    RestaurantController(JdbcTemplate jdbc, AddressClient addresses) {
         this.jdbc = jdbc;
         this.addresses = addresses;
     }
