@@ -16,6 +16,7 @@ var routes = map[string]string{
 	"order-tracking": "http://order-tracking:8080",
 	"user":           "http://user:8080",
 	"address":        "http://address:8080",
+	"restaurant":     "http://restaurant:8080",
 }
 
 func registerRoutes(mux *http.ServeMux, auth *verifier) error {
