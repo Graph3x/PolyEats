@@ -2,6 +2,7 @@ import json
 import sys
 import urllib.error
 import urllib.request
+import uuid
 
 GEOCODING = "http://localhost:8000"
 ORDER_TRACKING = "http://localhost:8001"
@@ -10,13 +11,15 @@ AUTH = "http://localhost:8003"
 GATEWAY = "http://localhost:8004"
 USER = "http://localhost:8005"
 
-CUSTOMER = {"email": "customer@polyeats.test", "password": "customer"}
-CUSTOMER_ID = "acc-customer"
+CUSTOMER = {
+    "email": f"customer-{uuid.uuid4().hex[:8]}@polyeats.test",
+    "password": "customer",
+}
+customer_id = None
 
 # Must be a row in geocoding's gazetteer, or the geocode call returns NOT_FOUND.
 SEED_ADDRESS = {
     "ownerType": "user",
-    "ownerId": CUSTOMER_ID,
     "street": "Skolni",
     "buildingNumber": "2",
     "city": "Krecovice",
@@ -54,6 +57,12 @@ def login():
     return call("POST", f"{GATEWAY}/auth/login", CUSTOMER)
 
 
+def register():
+    global customer_id
+    created = call("POST", f"{GATEWAY}/account/accounts", CUSTOMER)
+    customer_id = created["accountId"] if created else None
+
+
 def geocoding():
     call("GET", f"{GEOCODING}/health")
 
@@ -71,17 +80,18 @@ def address():
     token = tokens["access_token"]
 
     addresses = f"{GATEWAY}/address/addresses"
-    created = call("POST", addresses, SEED_ADDRESS, token=token)
+    seed = SEED_ADDRESS | {"ownerId": customer_id}
+    created = call("POST", addresses, seed, token=token)
     if not created:
         return
     created_id = created["id"]
 
     call("GET", f"{addresses}/{created_id}", token=token)
-    call("GET", f"{addresses}?ownerType=user&ownerId={CUSTOMER_ID}", token=token)
+    call("GET", f"{addresses}?ownerType=user&ownerId={customer_id}", token=token)
     call(
         "PUT",
         f"{addresses}/{created_id}",
-        SEED_ADDRESS | {"street": "Kostelni", "buildingNumber": "3"},
+        seed | {"street": "Kostelni", "buildingNumber": "3"},
         token=token,
     )
     call("DELETE", f"{addresses}/{created_id}", token=token)
@@ -90,14 +100,14 @@ def address():
     call(
         "POST",
         addresses,
-        SEED_ADDRESS | {"street": "Nowhere"},
+        seed | {"street": "Nowhere"},
         expect=422,
         token=token,
     )
     call(
         "POST",
         addresses,
-        SEED_ADDRESS | {"ownerId": "acc-other"},
+        seed | {"ownerId": "acc-other"},
         expect=403,
         token=token,
     )
@@ -112,7 +122,7 @@ def user():
     token = tokens["access_token"]
 
     users = f"{GATEWAY}/user/users"
-    me = f"{users}/{CUSTOMER_ID}"
+    me = f"{users}/{customer_id}"
     profile = {"name": "Customer", "email": CUSTOMER["email"]}
 
     call("POST", users, profile, token=token)
@@ -133,7 +143,7 @@ def restaurant():
     token = tokens["access_token"]
 
     restaurants = f"{GATEWAY}/restaurant/restaurants"
-    mine = f"{restaurants}/{CUSTOMER_ID}"
+    mine = f"{restaurants}/{customer_id}"
     profile = {"name": "Bistro", "cuisine": "czech"}
 
     call("POST", restaurants, profile, token=token)
@@ -174,10 +184,51 @@ def gateway():
     )
 
 
-SERVICES = [geocoding, order_tracking, address, user, restaurant, auth, gateway]
+def account():
+    accounts = f"{GATEWAY}/account/accounts"
+    me = f"{accounts}/{customer_id}"
+
+    call("POST", accounts, CUSTOMER, expect=409)
+    tokens = login()
+    if not tokens:
+        return
+
+    CUSTOMER["password"] = "changed"
+    call(
+        "PUT",
+        f"{me}/password",
+        {"password": "changed"},
+        token=tokens["access_token"],
+    )
+    tokens = login()
+    if not tokens:
+        return
+
+    call("DELETE", me, token=tokens["access_token"])
+    call(
+        "POST",
+        f"{GATEWAY}/auth/refresh",
+        {"refresh_token": tokens["refresh_token"]},
+        expect=401,
+    )
+
+
+SERVICES = [
+    geocoding,
+    order_tracking,
+    address,
+    user,
+    restaurant,
+    auth,
+    gateway,
+    account,
+]
 
 
 def main():
+    print("register")
+    register()
+
     for service in SERVICES:
         print(service.__name__)
         service()
