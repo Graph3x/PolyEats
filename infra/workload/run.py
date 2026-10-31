@@ -126,6 +126,24 @@ def user():
     call("GET", me, expect=404, token=token)
 
 
+def restaurant():
+    tokens = login()
+    if not tokens:
+        return
+    token = tokens["access_token"]
+
+    restaurants = f"{GATEWAY}/restaurant/restaurants"
+    mine = f"{restaurants}/{CUSTOMER_ID}"
+    profile = {"name": "Bistro", "cuisine": "czech"}
+
+    call("POST", restaurants, profile, token=token)
+    call("GET", restaurants, token=token)
+    call("GET", mine, token=token)
+    call("PUT", mine, profile | {"name": "Renamed"}, token=token)
+    call("GET", f"{mine}/addresses", token=token)
+    call("DELETE", mine, token=token)
+
+
 def auth():
     call("GET", f"{AUTH}/health")
     call("GET", f"{AUTH}/.well-known/jwks.json")
@@ -156,7 +174,7 @@ def gateway():
     )
 
 
-SERVICES = [geocoding, order_tracking, address, user, auth, gateway]
+SERVICES = [geocoding, order_tracking, address, user, restaurant, auth, gateway]
 
 
 def main():
