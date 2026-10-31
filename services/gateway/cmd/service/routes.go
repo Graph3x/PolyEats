@@ -17,6 +17,11 @@ var routes = map[string]string{
 	"user":           "http://user:8080",
 	"address":        "http://address:8080",
 	"restaurant":     "http://restaurant:8080",
+	"account":        "http://account:8080",
+}
+
+var publicRoutes = map[string][]string{
+	"account": {"POST /account/accounts"},
 }
 
 func registerRoutes(mux *http.ServeMux, auth *verifier) error {
@@ -35,7 +40,11 @@ func registerRoutes(mux *http.ServeMux, auth *verifier) error {
 			Transport:    upstream,
 			ErrorHandler: proxyError,
 		}
-		mux.Handle("/"+prefix+"/", auth.middleware(http.StripPrefix("/"+prefix, proxy)))
+		handler := http.StripPrefix("/"+prefix, proxy)
+		mux.Handle("/"+prefix+"/", auth.middleware(handler))
+		for _, pattern := range publicRoutes[prefix] {
+			mux.Handle(pattern, handler)
+		}
 	}
 	return nil
 }
