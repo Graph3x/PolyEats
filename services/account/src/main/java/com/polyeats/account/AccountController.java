@@ -104,7 +104,7 @@ class AccountController {
     void alreadyExists() {
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ExceptionHandler({DataIntegrityViolationException.class, IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     void invalidAccount() {
     }
