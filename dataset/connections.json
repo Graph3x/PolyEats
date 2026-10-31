@@ -93,6 +93,28 @@
       "native_name": null,
       "routing": null,
       "delivery": null
+    },
+    {
+      "id": "user",
+      "kind": "service",
+      "language": "java",
+      "stack": "spring-boot",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
+    },
+    {
+      "id": "db:user",
+      "kind": "datastore",
+      "language": null,
+      "stack": "postgres",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
     }
   ],
   "edges": [
@@ -456,6 +478,313 @@
       "pattern": [
         "env-var-config"
       ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "gateway",
+      "caller_endpoint": "POST /address/addresses",
+      "callee": "address",
+      "callee_endpoint": "POST /addresses",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "gateway",
+      "caller_endpoint": "GET /address/addresses",
+      "callee": "address",
+      "callee_endpoint": "GET /addresses",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "gateway",
+      "caller_endpoint": "GET /address/addresses/{id}",
+      "callee": "address",
+      "callee_endpoint": "GET /addresses/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "gateway",
+      "caller_endpoint": "PUT /address/addresses/{id}",
+      "callee": "address",
+      "callee_endpoint": "PUT /addresses/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "gateway",
+      "caller_endpoint": "DELETE /address/addresses/{id}",
+      "callee": "address",
+      "callee_endpoint": "DELETE /addresses/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "gateway",
+      "caller_endpoint": "POST /user/users",
+      "callee": "user",
+      "callee_endpoint": "POST /users",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "gateway",
+      "caller_endpoint": "GET /user/users/{id}",
+      "callee": "user",
+      "callee_endpoint": "GET /users/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "gateway",
+      "caller_endpoint": "PUT /user/users/{id}",
+      "callee": "user",
+      "callee_endpoint": "PUT /users/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "gateway",
+      "caller_endpoint": "DELETE /user/users/{id}",
+      "callee": "user",
+      "callee_endpoint": "DELETE /users/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "gateway",
+      "caller_endpoint": "GET /user/users/{id}/addresses",
+      "callee": "user",
+      "callee_endpoint": "GET /users/{id}/addresses",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "user",
+      "caller_endpoint": "GET /users/{id}/addresses",
+      "callee": "address",
+      "callee_endpoint": "GET /addresses",
+      "type": "rest",
+      "pattern": [
+        "client-wrapper",
+        "literal-url"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "user",
+      "caller_endpoint": null,
+      "callee": "auth",
+      "callee_endpoint": "GET /.well-known/jwks.json",
+      "type": "rest",
+      "pattern": [
+        "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "user",
+      "caller_endpoint": "POST /users",
+      "callee": "db:user",
+      "callee_endpoint": "users",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "user",
+      "caller_endpoint": "GET /users/{id}",
+      "callee": "db:user",
+      "callee_endpoint": "users",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "user",
+      "caller_endpoint": "PUT /users/{id}",
+      "callee": "db:user",
+      "callee_endpoint": "users",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "user",
+      "caller_endpoint": "DELETE /users/{id}",
+      "callee": "db:user",
+      "callee_endpoint": "users",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "user",
+      "caller_endpoint": "GET /users/{id}/addresses",
+      "callee": "db:user",
+      "callee_endpoint": "users",
+      "type": "query",
+      "pattern": null,
       "routing_key": null,
       "headers": null,
       "selector": null,
