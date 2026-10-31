@@ -27,7 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 class RestaurantController {
 
-    record User(String accountId, String name, String email) {
+    record Restaurant(String accountId, String name, String cuisine) {
     }
 
     private final JdbcTemplate jdbc;
@@ -42,37 +42,43 @@ class RestaurantController {
     void health() {
     }
 
-    @PostMapping("/users")
-    User create(@AuthenticationPrincipal Jwt jwt, @RequestBody User user) {
-        jdbc.update("INSERT INTO users (account_id, name, email) VALUES (?, ?, ?)",
-                jwt.getSubject(), user.name(), user.email());
+    @PostMapping("/restaurants")
+    Restaurant create(@AuthenticationPrincipal Jwt jwt, @RequestBody Restaurant restaurant) {
+        jdbc.update("INSERT INTO restaurants (account_id, name, cuisine) VALUES (?, ?, ?)",
+                jwt.getSubject(), restaurant.name(), restaurant.cuisine());
         return byId(jwt.getSubject());
     }
 
-    @GetMapping("/users/{id}")
-    User byId(@PathVariable String id) {
-        return jdbc.queryForObject("SELECT * FROM users WHERE account_id = ?",
-                new DataClassRowMapper<>(User.class), id);
+    @GetMapping("/restaurants")
+    List<Restaurant> all() {
+        return jdbc.query("SELECT * FROM restaurants", new DataClassRowMapper<>(Restaurant.class));
     }
 
-    @PutMapping("/users/{id}")
-    User update(@AuthenticationPrincipal Jwt jwt, @PathVariable String id, @RequestBody User user) {
+    @GetMapping("/restaurants/{id}")
+    Restaurant byId(@PathVariable String id) {
+        return jdbc.queryForObject("SELECT * FROM restaurants WHERE account_id = ?",
+                new DataClassRowMapper<>(Restaurant.class), id);
+    }
+
+    @PutMapping("/restaurants/{id}")
+    Restaurant update(@AuthenticationPrincipal Jwt jwt, @PathVariable String id, @RequestBody Restaurant restaurant) {
         requireOwner(jwt, id);
         byId(id);
-        jdbc.update("UPDATE users SET name = ?, email = ? WHERE account_id = ?", user.name(), user.email(), id);
+        jdbc.update("UPDATE restaurants SET name = ?, cuisine = ? WHERE account_id = ?",
+                restaurant.name(), restaurant.cuisine(), id);
         return byId(id);
     }
 
-    @GetMapping("/users/{id}/addresses")
+    @GetMapping("/restaurants/{id}/addresses")
     List<AddressClient.Address> addresses(@PathVariable String id) {
         byId(id);
-        return addresses.byUser(id);
+        return addresses.byRestaurant(id);
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/restaurants/{id}")
     void delete(@AuthenticationPrincipal Jwt jwt, @PathVariable String id) {
         requireOwner(jwt, id);
-        jdbc.update("DELETE FROM users WHERE account_id = ?", id);
+        jdbc.update("DELETE FROM restaurants WHERE account_id = ?", id);
     }
 
     private static void requireOwner(Jwt jwt, String id) {
@@ -83,7 +89,7 @@ class RestaurantController {
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    void userNotFound() {
+    void restaurantNotFound() {
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
@@ -93,7 +99,7 @@ class RestaurantController {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    void invalidUser() {
+    void invalidRestaurant() {
     }
 
     @ExceptionHandler(RestClientException.class)

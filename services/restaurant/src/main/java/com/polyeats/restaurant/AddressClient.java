@@ -31,7 +31,7 @@ class AddressClient {
                 .build();
     }
 
-    List<Address> byUser(String userId) {
-        return List.of(rest.getForObject("http://address:8080/addresses?ownerType=user&ownerId={id}", Address[].class, userId));
+    List<Address> byRestaurant(String restaurantId) {
+        return List.of(rest.getForObject("http://address:8080/addresses?ownerType=restaurant&ownerId={id}", Address[].class, restaurantId));
     }
 }
