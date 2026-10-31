@@ -1,3 +1,5 @@
+CREATE DATABASE address;
+\c address
 \i /schemas/address.sql
 
 CREATE DATABASE "user";

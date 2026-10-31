@@ -55,7 +55,6 @@ services:
   postgres:
     image: postgres:18
     environment:
-      POSTGRES_DB: address
       POSTGRES_USER: polyeats
       POSTGRES_PASSWORD: polyeats
     volumes:
@@ -64,7 +63,7 @@ services:
       - ./services/user/db/schema.sql:/schemas/user.sql:ro
       - ./services/restaurant/db/schema.sql:/schemas/restaurant.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U polyeats -d address"]
+      test: ["CMD-SHELL", "pg_isready -h localhost -U polyeats"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -138,6 +137,23 @@ services:
       POSTGRES_PASSWORD: polyeats
     ports:
       - "8005:8080" # REST
+    healthcheck: *healthcheck
+    networks:
+      - polyeats
+
+  restaurant:
+    build: ./services/restaurant
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: [*otel, *jwks]
+      OTEL_SERVICE_NAME: restaurant
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/restaurant
+      POSTGRES_USER: polyeats
+      POSTGRES_PASSWORD: polyeats
+    ports:
+      - "8006:8080" # REST
     healthcheck: *healthcheck
     networks:
       - polyeats
