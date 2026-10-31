@@ -1,5 +1,7 @@
-CREATE TABLE restaurants (
-  account_id TEXT PRIMARY KEY,
-  name       TEXT NOT NULL,
-  cuisine    TEXT NOT NULL
+CREATE TABLE accounts (
+  account_id    TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  email         TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  role          TEXT NOT NULL DEFAULT 'user',
+  epoch         BIGINT NOT NULL DEFAULT 1
 );

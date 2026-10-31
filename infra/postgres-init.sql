@@ -10,6 +10,10 @@ CREATE ROLE restaurant LOGIN PASSWORD 'restaurant';
 CREATE DATABASE restaurant OWNER restaurant;
 REVOKE CONNECT ON DATABASE restaurant FROM PUBLIC;
 
+CREATE ROLE account LOGIN PASSWORD 'account';
+CREATE DATABASE account OWNER account;
+REVOKE CONNECT ON DATABASE account FROM PUBLIC;
+
 \c address
 SET ROLE address;
 \i /schemas/address.sql
@@ -21,3 +25,7 @@ SET ROLE "user";
 \c restaurant
 SET ROLE restaurant;
 \i /schemas/restaurant.sql
+
+\c account
+SET ROLE account;
+\i /schemas/account.sql
