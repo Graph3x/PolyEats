@@ -7,6 +7,17 @@
   "doi": null,
   "nodes": [
     {
+      "id": "account",
+      "kind": "service",
+      "language": "java",
+      "stack": "spring-boot",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
+    },
+    {
       "id": "address",
       "kind": "service",
       "language": "java",
@@ -22,6 +33,17 @@
       "kind": "service",
       "language": "go",
       "stack": "grpc-go",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
+    },
+    {
+      "id": "db:account",
+      "kind": "datastore",
+      "language": null,
+      "stack": "postgres",
       "broker": null,
       "native_kind": null,
       "native_name": null,
@@ -62,6 +84,28 @@
       "delivery": null
     },
     {
+      "id": "db:restaurant",
+      "kind": "datastore",
+      "language": null,
+      "stack": "postgres",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
+    },
+    {
+      "id": "db:user",
+      "kind": "datastore",
+      "language": null,
+      "stack": "postgres",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
+    },
+    {
       "id": "gateway",
       "kind": "service",
       "language": "go",
@@ -95,28 +139,6 @@
       "delivery": null
     },
     {
-      "id": "user",
-      "kind": "service",
-      "language": "java",
-      "stack": "spring-boot",
-      "broker": null,
-      "native_kind": null,
-      "native_name": null,
-      "routing": null,
-      "delivery": null
-    },
-    {
-      "id": "db:user",
-      "kind": "datastore",
-      "language": null,
-      "stack": "postgres",
-      "broker": null,
-      "native_kind": null,
-      "native_name": null,
-      "routing": null,
-      "delivery": null
-    },
-    {
       "id": "restaurant",
       "kind": "service",
       "language": "java",
@@ -128,18 +150,7 @@
       "delivery": null
     },
     {
-      "id": "db:restaurant",
-      "kind": "datastore",
-      "language": null,
-      "stack": "postgres",
-      "broker": null,
-      "native_kind": null,
-      "native_name": null,
-      "routing": null,
-      "delivery": null
-    },
-    {
-      "id": "account",
+      "id": "user",
       "kind": "service",
       "language": "java",
       "stack": "spring-boot",
@@ -148,20 +159,107 @@
       "native_name": null,
       "routing": null,
       "delivery": null
-    },
-    {
-      "id": "db:account",
-      "kind": "datastore",
-      "language": null,
-      "stack": "postgres",
-      "broker": null,
-      "native_kind": null,
-      "native_name": null,
-      "routing": null,
-      "delivery": null
     }
   ],
   "edges": [
+    {
+      "id": "account.auth.997ab8",
+      "caller": "account",
+      "caller_endpoint": null,
+      "callee": "auth",
+      "callee_endpoint": "GET /.well-known/jwks.json",
+      "type": "rest",
+      "pattern": [
+        "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "account.db:account.35d813",
+      "caller": "account",
+      "caller_endpoint": "PUT /accounts/{id}/password",
+      "callee": "db:account",
+      "callee_endpoint": "accounts",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "account.db:account.7e2bf1",
+      "caller": "account",
+      "caller_endpoint": "DELETE /accounts/{id}",
+      "callee": "db:account",
+      "callee_endpoint": "accounts",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "account.db:account.9a3f21",
+      "caller": "account",
+      "caller_endpoint": "POST /accounts",
+      "callee": "db:account",
+      "callee_endpoint": "accounts",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "account.db:account.dba784",
+      "caller": "account",
+      "caller_endpoint": "POST /accounts/verify",
+      "callee": "db:account",
+      "callee_endpoint": "accounts",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "account.db:account.ff397d",
+      "caller": "account",
+      "caller_endpoint": "GET /accounts/{id}/state",
+      "callee": "db:account",
+      "callee_endpoint": "accounts",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
     {
       "id": "address.auth.997ab8",
       "caller": "address",
@@ -299,6 +397,48 @@
       "observed": false
     },
     {
+      "id": "auth.account.15fb93",
+      "caller": "auth",
+      "caller_endpoint": "Auth/Refresh",
+      "callee": "account",
+      "callee_endpoint": "GET /accounts/{id}/state",
+      "type": "rest",
+      "pattern": [
+        "client-wrapper",
+        "env-var-config",
+        "object-state",
+        "string-concatenation"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "auth.account.708aa1",
+      "caller": "auth",
+      "caller_endpoint": "Auth/Login",
+      "callee": "account",
+      "callee_endpoint": "POST /accounts/verify",
+      "type": "rest",
+      "pattern": [
+        "client-wrapper",
+        "env-var-config",
+        "object-state",
+        "string-concatenation"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
       "id": "auth.db:auth.6dabb6",
       "caller": "auth",
       "caller_endpoint": "Auth/Refresh",
@@ -338,6 +478,158 @@
       "callee_endpoint": "session",
       "type": "query",
       "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.account.384f07",
+      "caller": "gateway",
+      "caller_endpoint": "DELETE /account/accounts/{id}",
+      "callee": "account",
+      "callee_endpoint": "DELETE /accounts/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.account.38e5b7",
+      "caller": "gateway",
+      "caller_endpoint": "POST /account/accounts",
+      "callee": "account",
+      "callee_endpoint": "POST /accounts",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.account.466aa5",
+      "caller": "gateway",
+      "caller_endpoint": "PUT /account/accounts/{id}/password",
+      "callee": "account",
+      "callee_endpoint": "PUT /accounts/{id}/password",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.address.224896",
+      "caller": "gateway",
+      "caller_endpoint": "DELETE /address/addresses/{id}",
+      "callee": "address",
+      "callee_endpoint": "DELETE /addresses/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.address.2ca179",
+      "caller": "gateway",
+      "caller_endpoint": "POST /address/addresses",
+      "callee": "address",
+      "callee_endpoint": "POST /addresses",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.address.678c25",
+      "caller": "gateway",
+      "caller_endpoint": "GET /address/addresses",
+      "callee": "address",
+      "callee_endpoint": "GET /addresses",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.address.9eeb81",
+      "caller": "gateway",
+      "caller_endpoint": "PUT /address/addresses/{id}",
+      "callee": "address",
+      "callee_endpoint": "PUT /addresses/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.address.ac55f1",
+      "caller": "gateway",
+      "caller_endpoint": "GET /address/addresses/{id}",
+      "callee": "address",
+      "callee_endpoint": "GET /addresses/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
       "routing_key": null,
       "headers": null,
       "selector": null,
@@ -443,6 +735,215 @@
       "observed": false
     },
     {
+      "id": "gateway.restaurant.4874fe",
+      "caller": "gateway",
+      "caller_endpoint": "POST /restaurant/restaurants",
+      "callee": "restaurant",
+      "callee_endpoint": "POST /restaurants",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.restaurant.66fe88",
+      "caller": "gateway",
+      "caller_endpoint": "DELETE /restaurant/restaurants/{id}",
+      "callee": "restaurant",
+      "callee_endpoint": "DELETE /restaurants/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.restaurant.6d3681",
+      "caller": "gateway",
+      "caller_endpoint": "PUT /restaurant/restaurants/{id}",
+      "callee": "restaurant",
+      "callee_endpoint": "PUT /restaurants/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.restaurant.99a35c",
+      "caller": "gateway",
+      "caller_endpoint": "GET /restaurant/restaurants",
+      "callee": "restaurant",
+      "callee_endpoint": "GET /restaurants",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.restaurant.b5c7b2",
+      "caller": "gateway",
+      "caller_endpoint": "GET /restaurant/restaurants/{id}",
+      "callee": "restaurant",
+      "callee_endpoint": "GET /restaurants/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.restaurant.fce9a1",
+      "caller": "gateway",
+      "caller_endpoint": "GET /restaurant/restaurants/{id}/addresses",
+      "callee": "restaurant",
+      "callee_endpoint": "GET /restaurants/{id}/addresses",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.user.388404",
+      "caller": "gateway",
+      "caller_endpoint": "POST /user/users",
+      "callee": "user",
+      "callee_endpoint": "POST /users",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.user.65224e",
+      "caller": "gateway",
+      "caller_endpoint": "DELETE /user/users/{id}",
+      "callee": "user",
+      "callee_endpoint": "DELETE /users/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.user.9bde2d",
+      "caller": "gateway",
+      "caller_endpoint": "GET /user/users/{id}/addresses",
+      "callee": "user",
+      "callee_endpoint": "GET /users/{id}/addresses",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.user.a53a27",
+      "caller": "gateway",
+      "caller_endpoint": "GET /user/users/{id}",
+      "callee": "user",
+      "callee_endpoint": "GET /users/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.user.aab3bd",
+      "caller": "gateway",
+      "caller_endpoint": "PUT /user/users/{id}",
+      "callee": "user",
+      "callee_endpoint": "PUT /users/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
       "id": "geocoding.auth.997ab8",
       "caller": "geocoding",
       "caller_endpoint": null,
@@ -531,428 +1032,7 @@
       "observed": false
     },
     {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "POST /address/addresses",
-      "callee": "address",
-      "callee_endpoint": "POST /addresses",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "GET /address/addresses",
-      "callee": "address",
-      "callee_endpoint": "GET /addresses",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "GET /address/addresses/{id}",
-      "callee": "address",
-      "callee_endpoint": "GET /addresses/{id}",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "PUT /address/addresses/{id}",
-      "callee": "address",
-      "callee_endpoint": "PUT /addresses/{id}",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "DELETE /address/addresses/{id}",
-      "callee": "address",
-      "callee_endpoint": "DELETE /addresses/{id}",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "POST /user/users",
-      "callee": "user",
-      "callee_endpoint": "POST /users",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "GET /user/users/{id}",
-      "callee": "user",
-      "callee_endpoint": "GET /users/{id}",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "PUT /user/users/{id}",
-      "callee": "user",
-      "callee_endpoint": "PUT /users/{id}",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "DELETE /user/users/{id}",
-      "callee": "user",
-      "callee_endpoint": "DELETE /users/{id}",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "GET /user/users/{id}/addresses",
-      "callee": "user",
-      "callee_endpoint": "GET /users/{id}/addresses",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "user",
-      "caller_endpoint": "GET /users/{id}/addresses",
-      "callee": "address",
-      "callee_endpoint": "GET /addresses",
-      "type": "rest",
-      "pattern": [
-        "client-wrapper",
-        "literal-url"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "user",
-      "caller_endpoint": null,
-      "callee": "auth",
-      "callee_endpoint": "GET /.well-known/jwks.json",
-      "type": "rest",
-      "pattern": [
-        "env-var-config"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "user",
-      "caller_endpoint": "POST /users",
-      "callee": "db:user",
-      "callee_endpoint": "users",
-      "type": "query",
-      "pattern": null,
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "user",
-      "caller_endpoint": "GET /users/{id}",
-      "callee": "db:user",
-      "callee_endpoint": "users",
-      "type": "query",
-      "pattern": null,
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "user",
-      "caller_endpoint": "PUT /users/{id}",
-      "callee": "db:user",
-      "callee_endpoint": "users",
-      "type": "query",
-      "pattern": null,
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "user",
-      "caller_endpoint": "DELETE /users/{id}",
-      "callee": "db:user",
-      "callee_endpoint": "users",
-      "type": "query",
-      "pattern": null,
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "user",
-      "caller_endpoint": "GET /users/{id}/addresses",
-      "callee": "db:user",
-      "callee_endpoint": "users",
-      "type": "query",
-      "pattern": null,
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "POST /restaurant/restaurants",
-      "callee": "restaurant",
-      "callee_endpoint": "POST /restaurants",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "GET /restaurant/restaurants",
-      "callee": "restaurant",
-      "callee_endpoint": "GET /restaurants",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "GET /restaurant/restaurants/{id}",
-      "callee": "restaurant",
-      "callee_endpoint": "GET /restaurants/{id}",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "PUT /restaurant/restaurants/{id}",
-      "callee": "restaurant",
-      "callee_endpoint": "PUT /restaurants/{id}",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "DELETE /restaurant/restaurants/{id}",
-      "callee": "restaurant",
-      "callee_endpoint": "DELETE /restaurants/{id}",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "GET /restaurant/restaurants/{id}/addresses",
-      "callee": "restaurant",
-      "callee_endpoint": "GET /restaurants/{id}/addresses",
-      "type": "rest",
-      "pattern": [
-        "closure-captured",
-        "lookup-table"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
+      "id": "restaurant.address.90f360",
       "caller": "restaurant",
       "caller_endpoint": "GET /restaurants/{id}/addresses",
       "callee": "address",
@@ -971,7 +1051,7 @@
       "observed": false
     },
     {
-      "id": "",
+      "id": "restaurant.auth.997ab8",
       "caller": "restaurant",
       "caller_endpoint": null,
       "callee": "auth",
@@ -989,7 +1069,7 @@
       "observed": false
     },
     {
-      "id": "",
+      "id": "restaurant.db:restaurant.08bfd8",
       "caller": "restaurant",
       "caller_endpoint": "POST /restaurants",
       "callee": "db:restaurant",
@@ -1005,7 +1085,7 @@
       "observed": false
     },
     {
-      "id": "",
+      "id": "restaurant.db:restaurant.456d7e",
       "caller": "restaurant",
       "caller_endpoint": "GET /restaurants",
       "callee": "db:restaurant",
@@ -1021,39 +1101,7 @@
       "observed": false
     },
     {
-      "id": "",
-      "caller": "restaurant",
-      "caller_endpoint": "GET /restaurants/{id}",
-      "callee": "db:restaurant",
-      "callee_endpoint": "restaurants",
-      "type": "query",
-      "pattern": null,
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "restaurant",
-      "caller_endpoint": "PUT /restaurants/{id}",
-      "callee": "db:restaurant",
-      "callee_endpoint": "restaurants",
-      "type": "query",
-      "pattern": null,
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
+      "id": "restaurant.db:restaurant.90a9b5",
       "caller": "restaurant",
       "caller_endpoint": "DELETE /restaurants/{id}",
       "callee": "db:restaurant",
@@ -1069,7 +1117,39 @@
       "observed": false
     },
     {
-      "id": "",
+      "id": "restaurant.db:restaurant.9d02e0",
+      "caller": "restaurant",
+      "caller_endpoint": "PUT /restaurants/{id}",
+      "callee": "db:restaurant",
+      "callee_endpoint": "restaurants",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "restaurant.db:restaurant.cbb1fb",
+      "caller": "restaurant",
+      "caller_endpoint": "GET /restaurants/{id}",
+      "callee": "db:restaurant",
+      "callee_endpoint": "restaurants",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "restaurant.db:restaurant.d340f8",
       "caller": "restaurant",
       "caller_endpoint": "GET /restaurants/{id}/addresses",
       "callee": "db:restaurant",
@@ -1085,13 +1165,16 @@
       "observed": false
     },
     {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "POST /account/accounts",
-      "callee": "account",
-      "callee_endpoint": "POST /accounts",
+      "id": "user.address.618292",
+      "caller": "user",
+      "caller_endpoint": "GET /users/{id}/addresses",
+      "callee": "address",
+      "callee_endpoint": "GET /addresses",
       "type": "rest",
-      "pattern": ["closure-captured", "lookup-table"],
+      "pattern": [
+        "client-wrapper",
+        "literal-url"
+      ],
       "routing_key": null,
       "headers": null,
       "selector": null,
@@ -1101,77 +1184,15 @@
       "observed": false
     },
     {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "PUT /account/accounts/{id}/password",
-      "callee": "account",
-      "callee_endpoint": "PUT /accounts/{id}/password",
-      "type": "rest",
-      "pattern": ["closure-captured", "lookup-table"],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "gateway",
-      "caller_endpoint": "DELETE /account/accounts/{id}",
-      "callee": "account",
-      "callee_endpoint": "DELETE /accounts/{id}",
-      "type": "rest",
-      "pattern": ["closure-captured", "lookup-table"],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "auth",
-      "caller_endpoint": "Auth/Login",
-      "callee": "account",
-      "callee_endpoint": "POST /accounts/verify",
-      "type": "rest",
-      "pattern": ["client-wrapper", "env-var-config", "object-state", "string-concatenation"],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "auth",
-      "caller_endpoint": "Auth/Refresh",
-      "callee": "account",
-      "callee_endpoint": "GET /accounts/{id}/state",
-      "type": "rest",
-      "pattern": ["client-wrapper", "env-var-config", "object-state", "string-concatenation"],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "account",
+      "id": "user.auth.997ab8",
+      "caller": "user",
       "caller_endpoint": null,
       "callee": "auth",
       "callee_endpoint": "GET /.well-known/jwks.json",
       "type": "rest",
-      "pattern": ["env-var-config"],
+      "pattern": [
+        "env-var-config"
+      ],
       "routing_key": null,
       "headers": null,
       "selector": null,
@@ -1181,11 +1202,11 @@
       "observed": false
     },
     {
-      "id": "",
-      "caller": "account",
-      "caller_endpoint": "POST /accounts",
-      "callee": "db:account",
-      "callee_endpoint": "accounts",
+      "id": "user.db:user.0befe2",
+      "caller": "user",
+      "caller_endpoint": "GET /users/{id}/addresses",
+      "callee": "db:user",
+      "callee_endpoint": "users",
       "type": "query",
       "pattern": null,
       "routing_key": null,
@@ -1197,11 +1218,11 @@
       "observed": false
     },
     {
-      "id": "",
-      "caller": "account",
-      "caller_endpoint": "PUT /accounts/{id}/password",
-      "callee": "db:account",
-      "callee_endpoint": "accounts",
+      "id": "user.db:user.7af046",
+      "caller": "user",
+      "caller_endpoint": "POST /users",
+      "callee": "db:user",
+      "callee_endpoint": "users",
       "type": "query",
       "pattern": null,
       "routing_key": null,
@@ -1213,11 +1234,11 @@
       "observed": false
     },
     {
-      "id": "",
-      "caller": "account",
-      "caller_endpoint": "DELETE /accounts/{id}",
-      "callee": "db:account",
-      "callee_endpoint": "accounts",
+      "id": "user.db:user.87a25f",
+      "caller": "user",
+      "caller_endpoint": "PUT /users/{id}",
+      "callee": "db:user",
+      "callee_endpoint": "users",
       "type": "query",
       "pattern": null,
       "routing_key": null,
@@ -1229,11 +1250,11 @@
       "observed": false
     },
     {
-      "id": "",
-      "caller": "account",
-      "caller_endpoint": "POST /accounts/verify",
-      "callee": "db:account",
-      "callee_endpoint": "accounts",
+      "id": "user.db:user.8ace0e",
+      "caller": "user",
+      "caller_endpoint": "DELETE /users/{id}",
+      "callee": "db:user",
+      "callee_endpoint": "users",
       "type": "query",
       "pattern": null,
       "routing_key": null,
@@ -1245,11 +1266,11 @@
       "observed": false
     },
     {
-      "id": "",
-      "caller": "account",
-      "caller_endpoint": "GET /accounts/{id}/state",
-      "callee": "db:account",
-      "callee_endpoint": "accounts",
+      "id": "user.db:user.9a96d4",
+      "caller": "user",
+      "caller_endpoint": "GET /users/{id}",
+      "callee": "db:user",
+      "callee_endpoint": "users",
       "type": "query",
       "pattern": null,
       "routing_key": null,
