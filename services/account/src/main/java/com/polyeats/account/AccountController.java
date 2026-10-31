@@ -1,6 +1,5 @@
 package com.polyeats.account;
 
-import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -8,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,10 +24,23 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 class AccountController {
 
-    record Restaurant(String accountId, String name, String cuisine) {
+    record Credentials(String email, String password) {
+    }
+
+    record NewPassword(String password) {
+    }
+
+    record Identity(String accountId, String role, long epoch) {
+    }
+
+    record State(String role, long epoch) {
+    }
+
+    record Stored(String accountId, String passwordHash, String role, long epoch) {
     }
 
     private final JdbcTemplate jdbc;
+    private final PasswordEncoder passwords = new BCryptPasswordEncoder();
 
     AccountController(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
@@ -36,37 +50,42 @@ class AccountController {
     void health() {
     }
 
-    @PostMapping("/restaurants")
-    Restaurant create(@AuthenticationPrincipal Jwt jwt, @RequestBody Restaurant restaurant) {
-        jdbc.update("INSERT INTO restaurants (account_id, name, cuisine) VALUES (?, ?, ?)",
-                jwt.getSubject(), restaurant.name(), restaurant.cuisine());
-        return byId(jwt.getSubject());
+    @PostMapping("/accounts")
+    Identity register(@RequestBody Credentials credentials) {
+        return jdbc.queryForObject(
+                "INSERT INTO accounts (email, password_hash) VALUES (?, ?) RETURNING account_id, role, epoch",
+                new DataClassRowMapper<>(Identity.class),
+                credentials.email(), passwords.encode(credentials.password()));
     }
 
-    @GetMapping("/restaurants")
-    List<Restaurant> all() {
-        return jdbc.query("SELECT * FROM restaurants", new DataClassRowMapper<>(Restaurant.class));
-    }
-
-    @GetMapping("/restaurants/{id}")
-    Restaurant byId(@PathVariable String id) {
-        return jdbc.queryForObject("SELECT * FROM restaurants WHERE account_id = ?",
-                new DataClassRowMapper<>(Restaurant.class), id);
-    }
-
-    @PutMapping("/restaurants/{id}")
-    Restaurant update(@AuthenticationPrincipal Jwt jwt, @PathVariable String id, @RequestBody Restaurant restaurant) {
+    @PutMapping("/accounts/{id}/password")
+    void changePassword(@AuthenticationPrincipal Jwt jwt, @PathVariable String id, @RequestBody NewPassword password) {
         requireOwner(jwt, id);
-        byId(id);
-        jdbc.update("UPDATE restaurants SET name = ?, cuisine = ? WHERE account_id = ?",
-                restaurant.name(), restaurant.cuisine(), id);
-        return byId(id);
+        jdbc.update("UPDATE accounts SET password_hash = ?, epoch = epoch + 1 WHERE account_id = ?",
+                passwords.encode(password.password()), id);
     }
 
-    @DeleteMapping("/restaurants/{id}")
+    @DeleteMapping("/accounts/{id}")
     void delete(@AuthenticationPrincipal Jwt jwt, @PathVariable String id) {
         requireOwner(jwt, id);
-        jdbc.update("DELETE FROM restaurants WHERE account_id = ?", id);
+        jdbc.update("DELETE FROM accounts WHERE account_id = ?", id);
+    }
+
+    @PostMapping("/accounts/verify")
+    Identity verify(@RequestBody Credentials credentials) {
+        return jdbc.query("SELECT account_id, password_hash, role, epoch FROM accounts WHERE email = ?",
+                        new DataClassRowMapper<>(Stored.class), credentials.email())
+                .stream()
+                .filter(stored -> passwords.matches(credentials.password(), stored.passwordHash()))
+                .map(stored -> new Identity(stored.accountId(), stored.role(), stored.epoch()))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+    }
+
+    @GetMapping("/accounts/{id}/state")
+    State state(@PathVariable String id) {
+        return jdbc.queryForObject("SELECT role, epoch FROM accounts WHERE account_id = ?",
+                new DataClassRowMapper<>(State.class), id);
     }
 
     private static void requireOwner(Jwt jwt, String id) {
@@ -77,7 +96,7 @@ class AccountController {
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    void restaurantNotFound() {
+    void accountNotFound() {
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
@@ -87,6 +106,6 @@ class AccountController {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    void invalidRestaurant() {
+    void invalidAccount() {
     }
 }
