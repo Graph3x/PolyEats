@@ -13,11 +13,12 @@ import (
 )
 
 var routes = map[string]string{
-	"order-tracking": "http://order-tracking:8080",
-	"user":           "http://user:8080",
-	"address":        "http://address:8080",
-	"restaurant":     "http://restaurant:8080",
-	"account":        "http://account:8080",
+	"order-tracking":  "http://order-tracking:8080",
+	"user":            "http://user:8080",
+	"address":         "http://address:8080",
+	"restaurant":      "http://restaurant:8080",
+	"account":         "http://account:8080",
+	"courier-profile": "http://courier-profile:8080",
 }
 
 var publicRoutes = map[string][]string{
