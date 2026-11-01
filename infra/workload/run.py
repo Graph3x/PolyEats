@@ -154,6 +154,24 @@ def restaurant():
     call("DELETE", mine, token=token)
 
 
+def courier_profile():
+    tokens = login()
+    if not tokens:
+        return
+    token = tokens["access_token"]
+
+    couriers = f"{GATEWAY}/courier-profile/couriers"
+    mine = f"{couriers}/{customer_id}"
+    profile = {"name": "Courier", "vehicle": "bike", "status": "offline"}
+
+    call("POST", couriers, profile, token=token)
+    call("POST", couriers, profile, expect=409, token=token)
+    call("GET", mine, token=token)
+    call("PUT", mine, profile | {"vehicle": "car"}, token=token)
+    call("PUT", f"{mine}/status", {"status": "online"}, token=token)
+    call("DELETE", mine, expect=204, token=token)
+
+
 def auth():
     call("GET", f"{AUTH}/health")
     call("GET", f"{AUTH}/.well-known/jwks.json")
@@ -219,6 +237,7 @@ SERVICES = [
     address,
     user,
     restaurant,
+    courier_profile,
     auth,
     gateway,
     account,
