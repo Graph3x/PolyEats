@@ -18,6 +18,10 @@ CREATE ROLE "courier-profile" LOGIN PASSWORD 'courier-profile';
 CREATE DATABASE "courier-profile" OWNER "courier-profile";
 REVOKE CONNECT ON DATABASE "courier-profile" FROM PUBLIC;
 
+CREATE ROLE review LOGIN PASSWORD 'review';
+CREATE DATABASE review OWNER review;
+REVOKE CONNECT ON DATABASE review FROM PUBLIC;
+
 \c address
 SET ROLE address;
 \i /schemas/address.sql
@@ -37,3 +41,7 @@ SET ROLE account;
 \c courier-profile
 SET ROLE "courier-profile";
 \i /schemas/courier-profile.sql
+
+\c review
+SET ROLE review;
+\i /schemas/review.sql

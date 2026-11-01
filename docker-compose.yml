@@ -64,6 +64,7 @@ services:
       - ./services/restaurant/db/schema.sql:/schemas/restaurant.sql:ro
       - ./services/account/db/schema.sql:/schemas/account.sql:ro
       - ./services/courier-profile/db/schema.sql:/schemas/courier-profile.sql:ro
+      - ./services/review/db/schema.sql:/schemas/review.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h localhost -U polyeats"]
       interval: 5s
@@ -190,6 +191,23 @@ services:
       POSTGRES_PASSWORD: courier-profile
     ports:
       - "8008:8080" # REST
+    healthcheck: *healthcheck
+    networks:
+      - polyeats
+
+  review:
+    build: ./services/review
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: [*otel, *jwks]
+      OTEL_SERVICE_NAME: review
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/review
+      POSTGRES_USER: review
+      POSTGRES_PASSWORD: review
+    ports:
+      - "8009:8080" # REST
     healthcheck: *healthcheck
     networks:
       - polyeats
