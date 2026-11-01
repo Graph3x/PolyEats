@@ -172,6 +172,34 @@ def courier_profile():
     call("DELETE", mine, expect=204, token=token)
 
 
+def review():
+    tokens = login()
+    if not tokens:
+        return
+    token = tokens["access_token"]
+
+    users = f"{GATEWAY}/user/users"
+    restaurants = f"{GATEWAY}/restaurant/restaurants"
+    call("POST", users, {"name": "Reviewer", "email": CUSTOMER["email"]}, token=token)
+    call("POST", restaurants, {"name": "Bistro", "cuisine": "czech"}, token=token)
+
+    reviews = f"{GATEWAY}/review/reviews"
+    draft = {"restaurantId": customer_id, "rating": 5, "text": "Great"}
+    unknown = draft | {"restaurantId": "acc-other"}
+
+    created = call("POST", reviews, draft, token=token)
+    call("POST", reviews, unknown, expect=422, token=token)
+    if created:
+        mine = f"{reviews}/{created['id']}"
+        call("GET", f"{reviews}?restaurantId={customer_id}", token=token)
+        call("GET", mine, token=token)
+        call("PUT", mine, {"rating": 4, "text": None}, token=token)
+        call("DELETE", mine, expect=204, token=token)
+
+    call("DELETE", f"{users}/{customer_id}", token=token)
+    call("DELETE", f"{restaurants}/{customer_id}", token=token)
+
+
 def auth():
     call("GET", f"{AUTH}/health")
     call("GET", f"{AUTH}/.well-known/jwks.json")
@@ -238,6 +266,7 @@ SERVICES = [
     user,
     restaurant,
     courier_profile,
+    review,
     auth,
     gateway,
     account,
