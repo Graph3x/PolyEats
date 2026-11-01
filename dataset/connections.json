@@ -40,6 +40,17 @@
       "delivery": null
     },
     {
+      "id": "courier-profile",
+      "kind": "service",
+      "language": "java",
+      "stack": "quarkus",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
+    },
+    {
       "id": "db:account",
       "kind": "datastore",
       "language": null,
@@ -66,6 +77,17 @@
       "kind": "datastore",
       "language": null,
       "stack": "valkey",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
+    },
+    {
+      "id": "db:courier-profile",
+      "kind": "datastore",
+      "language": null,
+      "stack": "postgres",
       "broker": null,
       "native_kind": null,
       "native_name": null,
@@ -487,6 +509,104 @@
       "observed": false
     },
     {
+      "id": "courier-profile.auth.997ab8",
+      "caller": "courier-profile",
+      "caller_endpoint": null,
+      "callee": "auth",
+      "callee_endpoint": "GET /.well-known/jwks.json",
+      "type": "rest",
+      "pattern": [
+        "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "courier-profile.db:courier-profile.0b2b0d",
+      "caller": "courier-profile",
+      "caller_endpoint": "PUT /couriers/{id}/status",
+      "callee": "db:courier-profile",
+      "callee_endpoint": "couriers",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "courier-profile.db:courier-profile.4f0230",
+      "caller": "courier-profile",
+      "caller_endpoint": "DELETE /couriers/{id}",
+      "callee": "db:courier-profile",
+      "callee_endpoint": "couriers",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "courier-profile.db:courier-profile.9d2a1c",
+      "caller": "courier-profile",
+      "caller_endpoint": "POST /couriers",
+      "callee": "db:courier-profile",
+      "callee_endpoint": "couriers",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "courier-profile.db:courier-profile.9d6580",
+      "caller": "courier-profile",
+      "caller_endpoint": "PUT /couriers/{id}",
+      "callee": "db:courier-profile",
+      "callee_endpoint": "couriers",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "courier-profile.db:courier-profile.b444a9",
+      "caller": "courier-profile",
+      "caller_endpoint": "GET /couriers/{id}",
+      "callee": "db:courier-profile",
+      "callee_endpoint": "couriers",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
       "id": "gateway.account.384f07",
       "caller": "gateway",
       "caller_endpoint": "DELETE /account/accounts/{id}",
@@ -706,6 +826,101 @@
       "pattern": [
         "closure-captured",
         "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.courier-profile.272310",
+      "caller": "gateway",
+      "caller_endpoint": "PUT /courier-profile/couriers/{id}/status",
+      "callee": "courier-profile",
+      "callee_endpoint": "PUT /couriers/{id}/status",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.courier-profile.2d2526",
+      "caller": "gateway",
+      "caller_endpoint": "GET /courier-profile/couriers/{id}",
+      "callee": "courier-profile",
+      "callee_endpoint": "GET /couriers/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.courier-profile.9149ab",
+      "caller": "gateway",
+      "caller_endpoint": "PUT /courier-profile/couriers/{id}",
+      "callee": "courier-profile",
+      "callee_endpoint": "PUT /couriers/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.courier-profile.a18d0e",
+      "caller": "gateway",
+      "caller_endpoint": "DELETE /courier-profile/couriers/{id}",
+      "callee": "courier-profile",
+      "callee_endpoint": "DELETE /couriers/{id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.courier-profile.ab0744",
+      "caller": "gateway",
+      "caller_endpoint": "POST /courier-profile/couriers",
+      "callee": "courier-profile",
+      "callee_endpoint": "POST /couriers",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
       ],
       "routing_key": null,
       "headers": null,
