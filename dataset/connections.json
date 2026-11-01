@@ -1748,6 +1748,54 @@
       "derived_from": null,
       "static": true,
       "observed": false
+    },
+    {
+      "id": "",
+      "caller": "account",
+      "caller_endpoint": "DELETE /accounts/{id}",
+      "callee": "user",
+      "callee_endpoint": "DELETE /users/{id}",
+      "type": "rest",
+      "pattern": ["client-wrapper", "lookup-table"],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "account",
+      "caller_endpoint": "DELETE /accounts/{id}",
+      "callee": "restaurant",
+      "callee_endpoint": "DELETE /restaurants/{id}",
+      "type": "rest",
+      "pattern": ["client-wrapper", "lookup-table"],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "account",
+      "caller_endpoint": "DELETE /accounts/{id}",
+      "callee": "courier-profile",
+      "callee_endpoint": "DELETE /couriers/{id}",
+      "type": "rest",
+      "pattern": ["client-wrapper", "lookup-table"],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
     }
   ]
 }

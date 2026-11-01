@@ -1,9 +1,12 @@
 package com.polyeats.account;
 
+import java.net.SocketTimeoutException;
+import java.net.http.HttpTimeoutException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
@@ -40,10 +44,12 @@ class AccountController {
     }
 
     private final JdbcTemplate jdbc;
+    private final ProfileClient profiles;
     private final PasswordEncoder passwords = new BCryptPasswordEncoder();
 
-    AccountController(JdbcTemplate jdbc) {
+    AccountController(JdbcTemplate jdbc, ProfileClient profiles) {
         this.jdbc = jdbc;
+        this.profiles = profiles;
     }
 
     @GetMapping("/health")
@@ -68,6 +74,7 @@ class AccountController {
     @DeleteMapping("/accounts/{id}")
     void delete(@AuthenticationPrincipal Jwt jwt, @PathVariable String id) {
         requireOwner(jwt, id);
+        profiles.deleteAll(id);
         jdbc.update("DELETE FROM accounts WHERE account_id = ?", id);
     }
 
@@ -107,5 +114,11 @@ class AccountController {
     @ExceptionHandler({DataIntegrityViolationException.class, IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     void invalidAccount() {
+    }
+
+    @ExceptionHandler(RestClientException.class)
+    ResponseEntity<Void> profileFailed(RestClientException e) {
+        boolean timedOut = e.getCause() instanceof SocketTimeoutException || e.getCause() instanceof HttpTimeoutException;
+        return ResponseEntity.status(timedOut ? HttpStatus.GATEWAY_TIMEOUT : HttpStatus.BAD_GATEWAY).build();
     }
 }
