@@ -184,6 +184,7 @@ services:
         condition: service_healthy
     environment:
       <<: [*otel, *jwks]
+      OTEL_SERVICE_NAME: courier-profile
       POSTGRES_URL: jdbc:postgresql://postgres:5432/courier-profile
       POSTGRES_USER: courier-profile
       POSTGRES_PASSWORD: courier-profile
