@@ -129,7 +129,11 @@ func main() {
 	defer cancel()
 
 	grpcServer.GracefulStop()
-	httpServer.Shutdown(shutdownCtx)
-	db.Close()
-	shutdown(shutdownCtx)
+	if err := httpServer.Shutdown(shutdownCtx); err != nil {
+		log.Printf("http shutdown: %v", err)
+	}
+	_ = db.Close()
+	if err := shutdown(shutdownCtx); err != nil {
+		log.Printf("tracing shutdown: %v", err)
+	}
 }
