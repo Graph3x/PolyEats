@@ -79,6 +79,24 @@ public class ReviewResource {
         stored.delete();
     }
 
+    @DELETE
+    @Transactional
+    public void deleteByRestaurant(@QueryParam("restaurantId") String restaurantId) {
+        if (!jwt.getSubject().equals(restaurantId)) {
+            throw new ForbiddenException();
+        }
+        Review.delete("restaurantId", restaurantId);
+    }
+
+    @DELETE
+    @Transactional
+    public void deleteByUsert(@QueryParam("authorId") String restaurantId) {
+        if (!jwt.getSubject().equals(authorId)) {
+            throw new ForbiddenException();
+        }
+        Review.delete("authorId", authorId);
+    }
+
     private void requireAuthor(Review review) {
         if (!review.authorId.equals(jwt.getSubject())) {
             throw new ForbiddenException();
