@@ -3,6 +3,7 @@ package com.polyeats.review;
 import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
@@ -81,20 +82,23 @@ public class ReviewResource {
 
     @DELETE
     @Transactional
-    public void deleteByRestaurant(@QueryParam("restaurantId") String restaurantId) {
-        if (!jwt.getSubject().equals(restaurantId)) {
-            throw new ForbiddenException();
+    public void deleteByOwner(@QueryParam("restaurantId") String restaurantId, @QueryParam("authorId") String authorId) {
+        if (restaurantId != null && authorId != null) {
+            throw new BadRequestException();
         }
-        Review.delete("restaurantId", restaurantId);
-    }
 
-    @DELETE
-    @Transactional
-    public void deleteByUsert(@QueryParam("authorId") String restaurantId) {
-        if (!jwt.getSubject().equals(authorId)) {
+        if (restaurantId == null && authorId == null) {
+            throw new BadRequestException();
+        }
+
+        String field = restaurantId != null ? "restaurantId" : "authorId";
+        String ownerId = restaurantId != null ? restaurantId : authorId;
+
+        if (!jwt.getSubject().equals(ownerId)) {
             throw new ForbiddenException();
         }
-        Review.delete("authorId", authorId);
+
+        Review.delete(field, ownerId);
     }
 
     private void requireAuthor(Review review) {
