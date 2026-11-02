@@ -91,9 +91,6 @@ services:
       <<: [*otel, *jwks]
       OTEL_SERVICE_NAME: geocoding
       GEO_DB_PATH: /data/geo.db
-    ports:
-      - "8000:8080" # REST
-      - "9000:9090" # gRPC
     healthcheck: *healthcheck
     networks:
       - polyeats
@@ -104,8 +101,6 @@ services:
       <<: [*otel, *jwks]
       OTEL_SERVICE_NAME: order-tracking
       GEOCODING_ADDR: geocoding:9090
-    ports:
-      - "8001:8080" # REST
     healthcheck: *healthcheck
     networks:
       - polyeats
@@ -121,8 +116,6 @@ services:
       POSTGRES_URL: jdbc:postgresql://postgres:5432/address
       POSTGRES_USER: address
       POSTGRES_PASSWORD: address
-    ports:
-      - "8002:8080" # REST
     healthcheck: *healthcheck
     networks:
       - polyeats
@@ -138,8 +131,6 @@ services:
       POSTGRES_URL: jdbc:postgresql://postgres:5432/user
       POSTGRES_USER: user
       POSTGRES_PASSWORD: user
-    ports:
-      - "8005:8080" # REST
     healthcheck: *healthcheck
     networks:
       - polyeats
@@ -155,8 +146,6 @@ services:
       POSTGRES_URL: jdbc:postgresql://postgres:5432/restaurant
       POSTGRES_USER: restaurant
       POSTGRES_PASSWORD: restaurant
-    ports:
-      - "8006:8080" # REST
     healthcheck: *healthcheck
     networks:
       - polyeats
@@ -172,8 +161,6 @@ services:
       POSTGRES_URL: jdbc:postgresql://postgres:5432/account
       POSTGRES_USER: account
       POSTGRES_PASSWORD: account
-    ports:
-      - "8007:8080" # REST
     healthcheck: *healthcheck
     networks:
       - polyeats
@@ -189,8 +176,6 @@ services:
       POSTGRES_URL: jdbc:postgresql://postgres:5432/courier-profile
       POSTGRES_USER: courier-profile
       POSTGRES_PASSWORD: courier-profile
-    ports:
-      - "8008:8080" # REST
     healthcheck: *healthcheck
     networks:
       - polyeats
@@ -206,8 +191,6 @@ services:
       POSTGRES_URL: jdbc:postgresql://postgres:5432/review
       POSTGRES_USER: review
       POSTGRES_PASSWORD: review
-    ports:
-      - "8009:8080" # REST
     healthcheck: *healthcheck
     networks:
       - polyeats
@@ -235,9 +218,6 @@ services:
       JWT_KEY_PATH: /keys/dev.pem
     volumes:
       - ./services/auth/keys/dev.pem:/keys/dev.pem:ro
-    ports:
-      - "8003:8080" # REST
-      - "9003:9090" # gRPC
     healthcheck: *healthcheck
     networks:
       - polyeats

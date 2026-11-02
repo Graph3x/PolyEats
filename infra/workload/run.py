@@ -4,12 +4,7 @@ import urllib.error
 import urllib.request
 import uuid
 
-GEOCODING = "http://localhost:8000"
-ORDER_TRACKING = "http://localhost:8001"
-ADDRESS = "http://localhost:8002"
-AUTH = "http://localhost:8003"
 GATEWAY = "http://localhost:8004"
-USER = "http://localhost:8005"
 
 CUSTOMER = {
     "email": f"customer-{uuid.uuid4().hex[:8]}@polyeats.test",
@@ -63,17 +58,7 @@ def register():
     customer_id = created["accountId"] if created else None
 
 
-def geocoding():
-    call("GET", f"{GEOCODING}/health")
-
-
-def order_tracking():
-    call("GET", f"{ORDER_TRACKING}/health")
-
-
 def address():
-    call("GET", f"{ADDRESS}/health")
-
     tokens = login()
     if not tokens:
         return
@@ -114,8 +99,6 @@ def address():
 
 
 def user():
-    call("GET", f"{USER}/health")
-
     tokens = login()
     if not tokens:
         return
@@ -200,11 +183,6 @@ def review():
     call("DELETE", f"{restaurants}/{customer_id}", token=token)
 
 
-def auth():
-    call("GET", f"{AUTH}/health")
-    call("GET", f"{AUTH}/.well-known/jwks.json")
-
-
 def gateway():
     call("GET", f"{GATEWAY}/health")
 
@@ -260,14 +238,11 @@ def account():
 
 
 SERVICES = [
-    geocoding,
-    order_tracking,
     address,
     user,
     restaurant,
     courier_profile,
     review,
-    auth,
     gateway,
     account,
 ]
