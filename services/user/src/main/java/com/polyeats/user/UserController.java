@@ -32,10 +32,12 @@ class UserController {
 
     private final JdbcTemplate jdbc;
     private final AddressClient addresses;
+    private final ReviewClient reviews;
 
-    UserController(JdbcTemplate jdbc, AddressClient addresses) {
+    UserController(JdbcTemplate jdbc, AddressClient addresses, ReviewClient reviews) {
         this.jdbc = jdbc;
         this.addresses = addresses;
+        this.reviews = reviews;
     }
 
     @GetMapping("/health")
@@ -72,6 +74,8 @@ class UserController {
     @DeleteMapping("/users/{id}")
     void delete(@AuthenticationPrincipal Jwt jwt, @PathVariable String id) {
         requireOwner(jwt, id);
+        reviews.deleteByAuthor(id);
+        addresses.deleteByUser(id);
         jdbc.update("DELETE FROM users WHERE account_id = ?", id);
     }
 

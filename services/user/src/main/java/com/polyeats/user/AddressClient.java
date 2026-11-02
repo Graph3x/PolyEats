@@ -34,4 +34,8 @@ class AddressClient {
     List<Address> byUser(String userId) {
         return List.of(rest.getForObject("http://address:8080/addresses?ownerType=user&ownerId={id}", Address[].class, userId));
     }
+
+    void deleteByUser(String userId) {
+        rest.delete("http://address:8080/addresses?ownerType=user&ownerId={id}", userId);
+    }
 }
