@@ -12,4 +12,5 @@ RUN CGO_ENABLED=0 go build -o /service ./cmd/service
 
 FROM alpine:${ALPINE_VERSION}
 COPY --from=build /service /service
+USER nobody
 ENTRYPOINT ["/service"]

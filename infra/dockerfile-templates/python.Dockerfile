@@ -8,5 +8,6 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
+USER nobody
 ENTRYPOINT ["opentelemetry-instrument"]
 CMD ["python", "app.py"]

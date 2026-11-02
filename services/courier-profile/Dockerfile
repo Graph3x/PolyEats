@@ -13,6 +13,7 @@ RUN mvn -B package -DskipTests -Dquarkus.package.jar.type=fast-jar
 
 FROM eclipse-temurin:${JAVA_VERSION}-jre-alpine
 ARG OTEL_JAVAAGENT_VERSION
-ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/${OTEL_JAVAAGENT_VERSION}/opentelemetry-javaagent.jar /otel/opentelemetry-javaagent.jar
+ADD --chmod=755 https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/${OTEL_JAVAAGENT_VERSION}/opentelemetry-javaagent.jar /otel/opentelemetry-javaagent.jar
 COPY --from=build /src/target/quarkus-app/ /app/
+USER nobody
 ENTRYPOINT ["java", "-javaagent:/otel/opentelemetry-javaagent.jar", "-jar", "/app/quarkus-run.jar"]

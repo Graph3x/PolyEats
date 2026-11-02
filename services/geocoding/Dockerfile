@@ -18,4 +18,5 @@ RUN sqlite3 /geo.db < /geo.sql
 FROM alpine:${ALPINE_VERSION}
 COPY --from=build /service /service
 COPY --from=seed /geo.db /data/geo.db
+USER nobody
 ENTRYPOINT ["/service"]
