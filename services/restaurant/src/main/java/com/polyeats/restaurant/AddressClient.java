@@ -34,4 +34,8 @@ class AddressClient {
     List<Address> byRestaurant(String restaurantId) {
         return List.of(rest.getForObject("http://address:8080/addresses?ownerType=restaurant&ownerId={id}", Address[].class, restaurantId));
     }
+
+    void deleteByRestaurant(String restaurantId) {
+        rest.delete("http://address:8080/addresses?ownerType=restaurant&ownerId={id}", restaurantId);
+    }
 }

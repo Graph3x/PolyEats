@@ -32,10 +32,12 @@ class RestaurantController {
 
     private final JdbcTemplate jdbc;
     private final AddressClient addresses;
+    private final ReviewClient reviews;
 
-    RestaurantController(JdbcTemplate jdbc, AddressClient addresses) {
+    RestaurantController(JdbcTemplate jdbc, AddressClient addresses, ReviewClient reviews) {
         this.jdbc = jdbc;
         this.addresses = addresses;
+        this.reviews = reviews;
     }
 
     @GetMapping("/health")
@@ -78,6 +80,8 @@ class RestaurantController {
     @DeleteMapping("/restaurants/{id}")
     void delete(@AuthenticationPrincipal Jwt jwt, @PathVariable String id) {
         requireOwner(jwt, id);
+        reviews.deleteByRestaurant(id);
+        addresses.deleteByRestaurant(id);
         jdbc.update("DELETE FROM restaurants WHERE account_id = ?", id);
     }
 
