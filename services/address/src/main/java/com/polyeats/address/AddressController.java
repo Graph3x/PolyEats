@@ -90,6 +90,12 @@ class AddressController {
         jdbc.update("DELETE FROM addresses WHERE id = ?", id);
     }
 
+    @DeleteMapping("/addresses")
+    void deleteByOwner(@AuthenticationPrincipal Jwt jwt, @RequestParam String ownerType, @RequestParam String ownerId) {
+        requireOwner(jwt, ownerId);
+        jdbc.update("DELETE FROM addresses WHERE owner_type = ? AND owner_id = ?", ownerType, ownerId);
+    }
+
     private static void requireOwner(Jwt jwt, String ownerId) {
         if (!jwt.getSubject().equals(ownerId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
