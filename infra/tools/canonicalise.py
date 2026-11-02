@@ -17,6 +17,7 @@ class Formatter:
         for key in Constants.TOP_KEYS:
             if key not in self.data:
                 self.errors.append(f"top level: missing {key!r}")
+        self._unknown("top level", self.data, Constants.TOP_KEYS)
         for key in ("schema_version", "license"):
             if self.data.get(key) is None:
                 self.errors.append(f"top level: {key!r} must not be null")
@@ -26,10 +27,15 @@ class Formatter:
             for key in Constants.SOURCE_KEYS:
                 if not source.get(key):
                     self.errors.append(f"source: missing {key!r}")
+            self._unknown("source", source, Constants.SOURCE_KEYS)
 
     def _enum(self, where, value, allowed) -> None:
         if value is not None and value not in allowed:
             self.errors.append(f"{where}: {value!r} not one of {sorted(allowed)}")
+
+    def _unknown(self, where, item, keys) -> None:
+        for key in sorted(item.keys() - set(keys)):
+            self.errors.append(f"{where}: unknown key {key!r}")
 
     def _validate_nodes(self, nodes: list) -> None:
         seen = set()
@@ -37,6 +43,7 @@ class Formatter:
             for key in Constants.NODE_KEYS:
                 if key not in node:
                     self.errors.append(f"node[{index}]: missing {key!r}")
+            self._unknown(f"node[{index}]", node, Constants.NODE_KEYS)
 
             node_id = node.get("id")
             if not node_id:
@@ -47,6 +54,11 @@ class Formatter:
             if node_id in seen:
                 self.errors.append(f"{where}: duplicate id")
             seen.add(node_id)
+
+            if node.get("kind") is None:
+                self.errors.append(f"{where}: 'kind' must not be null")
+            if node.get("kind") == "service" and node.get("language") is None:
+                self.errors.append(f"{where}: services need a 'language'")
 
             self._enum(where, node.get("kind"), Constants.KINDS)
             self._enum(where, node.get("language"), Constants.LANGUAGES)
@@ -62,6 +74,9 @@ class Formatter:
             for key in Constants.EDGE_KEYS:
                 if key != "id" and key not in edge:
                     self.errors.append(f"{where}: missing {key!r}")
+            self._unknown(where, edge, Constants.EDGE_KEYS)
+            if edge_type is None:
+                self.errors.append(f"{where}: 'type' must not be null")
             for end in ("caller", "callee"):
                 if edge.get(end) not in kinds:
                     self.errors.append(
@@ -79,6 +94,10 @@ class Formatter:
                     )
                 for pattern in patterns:
                     self._enum(where, pattern, Constants.PATTERNS)
+            if edge_type in Constants.PATTERN_TYPES and not patterns:
+                self.errors.append(
+                    f"{where}: {edge_type!r} edges need a non-empty 'pattern'"
+                )
 
             if edge_type == "query" and kinds.get(edge.get("callee")) != "datastore":
                 self.errors.append(f"{where}: 'query' edges must end at a datastore")
@@ -137,7 +156,10 @@ class Formatter:
         sys.exit(1)
 
     def check_references(self):
-        known = {edge["id"] for edge in self.data["edges"]}
+        ids = [edge["id"] for edge in self.data["edges"]]
+        known = set(ids)
+        for duplicate in sorted({edge_id for edge_id in ids if ids.count(edge_id) > 1}):
+            self.errors.append(f"edge {duplicate!r}: duplicate id")
         for edge in self.data["edges"]:
             for reference in edge.get("derived_from") or []:
                 if reference not in known:

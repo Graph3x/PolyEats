@@ -137,12 +137,35 @@ def test_minimal_document_is_valid():
         ),
         (lambda d: d.update(nodes=None), "must both be arrays"),
         (lambda d: d.pop("license"), "missing 'license'"),
+        (lambda d: d.update(extra=1), "top level: unknown key 'extra'"),
+        (lambda d: d["nodes"][0].update(extra=1), "node[0]: unknown key 'extra'"),
+        (lambda d: d["edges"][0].update(extra=1), "unknown key 'extra'"),
+        (lambda d: d["nodes"][1].update(kind=None), "'kind' must not be null"),
+        (lambda d: d["edges"][0].update(type=None), "'type' must not be null"),
+        (lambda d: d["nodes"][0].update(language=None), "services need a 'language'"),
+        (
+            lambda d: d["edges"][0].update(type="rest", callee="svc"),
+            "'rest' edges need a non-empty 'pattern'",
+        ),
+        (
+            lambda d: d["edges"][0].update(type="grpc", callee="svc", pattern=[]),
+            "'grpc' edges need a non-empty 'pattern'",
+        ),
     ],
 )
 def test_validation_rule_fires(mutate, expected):
     data = document()
     mutate(data)
     assert expected in errors_for(data)
+
+
+def test_duplicate_edge_ids_are_rejected():
+    data = document()
+    data["edges"].append(dict(data["edges"][0]))
+    formatter = Formatter(data)
+    formatter.complete()
+    formatter.check_references()
+    assert "duplicate id" in " ".join(formatter.errors)
 
 
 def test_committed_baseline_is_valid_and_canonical():
