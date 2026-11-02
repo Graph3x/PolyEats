@@ -79,7 +79,7 @@ func (s *authServer) callAccount(ctx context.Context, method, path string, body,
 	if err != nil {
 		return 0, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return resp.StatusCode, nil
 	}

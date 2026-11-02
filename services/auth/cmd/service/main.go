@@ -131,7 +131,7 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 func jwksHandler(body []byte) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(body)
+		_, _ = w.Write(body)
 	}
 }
 
@@ -202,7 +202,11 @@ func main() {
 	defer cancel()
 
 	grpcServer.GracefulStop()
-	httpServer.Shutdown(shutdownCtx)
+	if err := httpServer.Shutdown(shutdownCtx); err != nil {
+		log.Printf("http shutdown: %v", err)
+	}
 	store.Close()
-	shutdown(shutdownCtx)
+	if err := shutdown(shutdownCtx); err != nil {
+		log.Printf("tracing shutdown: %v", err)
+	}
 }
