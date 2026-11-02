@@ -57,7 +57,7 @@ func authRoute[Req, Resp proto.Message](newReq func() Req, call func(context.Con
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(out)
+		_, _ = w.Write(out)
 	}
 }
 

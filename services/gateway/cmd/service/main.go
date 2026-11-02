@@ -60,7 +60,11 @@ func main() {
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	httpServer.Shutdown(shutdownCtx)
-	authConn.Close()
-	shutdown(shutdownCtx)
+	if err := httpServer.Shutdown(shutdownCtx); err != nil {
+		log.Printf("http shutdown: %v", err)
+	}
+	_ = authConn.Close()
+	if err := shutdown(shutdownCtx); err != nil {
+		log.Printf("tracing shutdown: %v", err)
+	}
 }

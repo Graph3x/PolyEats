@@ -136,7 +136,7 @@ func (v *verifier) fetch(ctx context.Context) (map[string]*rsa.PublicKey, error)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("jwks status %d", resp.StatusCode)
 	}
