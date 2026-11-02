@@ -14,14 +14,18 @@ class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/health").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/accounts").permitAll()
-                        .requestMatchers("/accounts/verify", "/accounts/*/state").hasRole("service")
-                        .anyRequest().authenticated())
+        return http.authorizeHttpRequests(requests ->
+                        requests.requestMatchers("/health")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.POST, "/accounts")
+                                .permitAll()
+                                .requestMatchers("/accounts/verify", "/accounts/*/state")
+                                .hasRole("service")
+                                .anyRequest()
+                                .authenticated())
                 .oauth2ResourceServer(server -> server.jwt(Customizer.withDefaults()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }

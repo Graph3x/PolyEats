@@ -13,12 +13,14 @@ class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/health").permitAll()
-                        .anyRequest().authenticated())
+        return http.authorizeHttpRequests(requests ->
+                        requests.requestMatchers("/health")
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated())
                 .oauth2ResourceServer(server -> server.jwt(Customizer.withDefaults()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }

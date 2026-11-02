@@ -1,6 +1,7 @@
 package com.polyeats.courierprofile;
 
 import io.quarkus.security.Authenticated;
+
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.DELETE;
@@ -12,6 +13,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
+
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
@@ -20,11 +22,9 @@ import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 @Authenticated
 public class CourierResource {
 
-    public record NewStatus(String status) {
-    }
+    public record NewStatus(String status) {}
 
-    @Inject
-    JsonWebToken jwt;
+    @Inject JsonWebToken jwt;
 
     @POST
     @Transactional

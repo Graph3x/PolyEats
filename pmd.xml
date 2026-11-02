@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<ruleset name="polyeats"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+    <description>PMD quickstart, minus rules that fight Spring/Quarkus and gRPC idioms.</description>
+
+    <rule ref="rulesets/java/quickstart.xml">
+        <!-- Annotation-driven handlers (@ExceptionHandler, health endpoints) have intentionally empty bodies. -->
+        <exclude name="UncommentedEmptyMethodBody"/>
+        <!-- ReqT/RespT is the gRPC API's own naming. -->
+        <exclude name="TypeParameterNamingConventions"/>
+    </rule>
+</ruleset>

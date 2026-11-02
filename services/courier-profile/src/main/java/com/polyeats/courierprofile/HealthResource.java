@@ -7,6 +7,5 @@ import jakarta.ws.rs.Path;
 public class HealthResource {
 
     @GET
-    public void health() {
-    }
+    public void health() {}
 }

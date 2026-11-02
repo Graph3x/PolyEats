@@ -1,7 +1,5 @@
 package com.polyeats.account;
 
-import java.net.SocketTimeoutException;
-import java.net.http.HttpTimeoutException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -25,23 +23,21 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.net.SocketTimeoutException;
+import java.net.http.HttpTimeoutException;
+
 @RestController
 class AccountController {
 
-    record Credentials(String email, String password) {
-    }
+    record Credentials(String email, String password) {}
 
-    record NewPassword(String password) {
-    }
+    record NewPassword(String password) {}
 
-    record Identity(String accountId, String role, long epoch) {
-    }
+    record Identity(String accountId, String role, long epoch) {}
 
-    record State(String role, long epoch) {
-    }
+    record State(String role, long epoch) {}
 
-    record Stored(String accountId, String passwordHash, String role, long epoch) {
-    }
+    record Stored(String accountId, String passwordHash, String role, long epoch) {}
 
     private final JdbcTemplate jdbc;
     private final ProfileClient profiles;
@@ -53,22 +49,28 @@ class AccountController {
     }
 
     @GetMapping("/health")
-    void health() {
-    }
+    void health() {}
 
     @PostMapping("/accounts")
     Identity register(@RequestBody Credentials credentials) {
         return jdbc.queryForObject(
-                "INSERT INTO accounts (email, password_hash) VALUES (?, ?) RETURNING account_id, role, epoch",
+                "INSERT INTO accounts (email, password_hash) VALUES (?, ?) RETURNING account_id,"
+                    + " role, epoch",
                 new DataClassRowMapper<>(Identity.class),
-                credentials.email(), passwords.encode(credentials.password()));
+                credentials.email(),
+                passwords.encode(credentials.password()));
     }
 
     @PutMapping("/accounts/{id}/password")
-    void changePassword(@AuthenticationPrincipal Jwt jwt, @PathVariable String id, @RequestBody NewPassword password) {
+    void changePassword(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable String id,
+            @RequestBody NewPassword password) {
         requireOwner(jwt, id);
-        jdbc.update("UPDATE accounts SET password_hash = ?, epoch = epoch + 1 WHERE account_id = ?",
-                passwords.encode(password.password()), id);
+        jdbc.update(
+                "UPDATE accounts SET password_hash = ?, epoch = epoch + 1 WHERE account_id = ?",
+                passwords.encode(password.password()),
+                id);
     }
 
     @DeleteMapping("/accounts/{id}")
@@ -80,8 +82,12 @@ class AccountController {
 
     @PostMapping("/accounts/verify")
     Identity verify(@RequestBody Credentials credentials) {
-        return jdbc.query("SELECT account_id, password_hash, role, epoch FROM accounts WHERE email = ?",
-                        new DataClassRowMapper<>(Stored.class), credentials.email())
+        return jdbc
+                .query(
+                        "SELECT account_id, password_hash, role, epoch FROM accounts WHERE email ="
+                            + " ?",
+                        new DataClassRowMapper<>(Stored.class),
+                        credentials.email())
                 .stream()
                 .filter(stored -> passwords.matches(credentials.password(), stored.passwordHash()))
                 .map(stored -> new Identity(stored.accountId(), stored.role(), stored.epoch()))
@@ -91,8 +97,10 @@ class AccountController {
 
     @GetMapping("/accounts/{id}/state")
     State state(@PathVariable String id) {
-        return jdbc.queryForObject("SELECT role, epoch FROM accounts WHERE account_id = ?",
-                new DataClassRowMapper<>(State.class), id);
+        return jdbc.queryForObject(
+                "SELECT role, epoch FROM accounts WHERE account_id = ?",
+                new DataClassRowMapper<>(State.class),
+                id);
     }
 
     private static void requireOwner(Jwt jwt, String id) {
@@ -103,22 +111,22 @@ class AccountController {
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    void accountNotFound() {
-    }
+    void accountNotFound() {}
 
     @ExceptionHandler(DuplicateKeyException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    void alreadyExists() {
-    }
+    void alreadyExists() {}
 
     @ExceptionHandler({DataIntegrityViolationException.class, IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    void invalidAccount() {
-    }
+    void invalidAccount() {}
 
     @ExceptionHandler(RestClientException.class)
     ResponseEntity<Void> profileFailed(RestClientException e) {
-        boolean timedOut = e.getCause() instanceof SocketTimeoutException || e.getCause() instanceof HttpTimeoutException;
-        return ResponseEntity.status(timedOut ? HttpStatus.GATEWAY_TIMEOUT : HttpStatus.BAD_GATEWAY).build();
+        boolean timedOut =
+                e.getCause() instanceof SocketTimeoutException
+                        || e.getCause() instanceof HttpTimeoutException;
+        return ResponseEntity.status(timedOut ? HttpStatus.GATEWAY_TIMEOUT : HttpStatus.BAD_GATEWAY)
+                .build();
     }
 }

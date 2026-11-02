@@ -3,9 +3,9 @@ package com.polyeats.address;
 import com.polyeats.geocoding.Coordinates;
 import com.polyeats.geocoding.GeocodeRequest;
 import com.polyeats.geocoding.GeocodingGrpc;
+
 import io.grpc.StatusRuntimeException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -26,13 +26,22 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 @RestController
 class AddressController {
 
-    record Address(Long id, String ownerType, String ownerId, String street,
-                   String buildingNumber, String city, String postalCode,
-                   Double lat, Double lon) {
-    }
+    record Address(
+            Long id,
+            String ownerType,
+            String ownerId,
+            String street,
+            String buildingNumber,
+            String city,
+            String postalCode,
+            Double lat,
+            Double lon) {}
 
     private final JdbcTemplate jdbc;
     private final GeocodingGrpc.GeocodingBlockingStub geocoding;
@@ -43,44 +52,64 @@ class AddressController {
     }
 
     @GetMapping("/health")
-    void health() {
-    }
+    void health() {}
 
     @PostMapping("/addresses")
     Address create(@AuthenticationPrincipal Jwt jwt, @RequestBody Address address) {
         requireOwner(jwt, address.ownerId());
         Coordinates coordinates = resolve(address);
-        Long id = jdbc.queryForObject(
-                "INSERT INTO addresses (owner_type, owner_id, street, building_number, city, postal_code, lat, lon) "
-                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id",
-                Long.class,
-                address.ownerType(), address.ownerId(), address.street(), address.buildingNumber(),
-                address.city(), address.postalCode(), coordinates.getLat(), coordinates.getLon());
+        Long id =
+                jdbc.queryForObject(
+                        "INSERT INTO addresses (owner_type, owner_id, street, building_number,"
+                            + " city, postal_code, lat, lon) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                            + " RETURNING id",
+                        Long.class,
+                        address.ownerType(),
+                        address.ownerId(),
+                        address.street(),
+                        address.buildingNumber(),
+                        address.city(),
+                        address.postalCode(),
+                        coordinates.getLat(),
+                        coordinates.getLon());
         return byId(id);
     }
 
     @GetMapping("/addresses/{id}")
     Address byId(@PathVariable Long id) {
-        return jdbc.queryForObject("SELECT * FROM addresses WHERE id = ?",
-                new DataClassRowMapper<>(Address.class), id);
+        return jdbc.queryForObject(
+                "SELECT * FROM addresses WHERE id = ?",
+                new DataClassRowMapper<>(Address.class),
+                id);
     }
 
     @GetMapping("/addresses")
     List<Address> byOwner(@RequestParam String ownerType, @RequestParam String ownerId) {
-        return jdbc.query("SELECT * FROM addresses WHERE owner_type = ? AND owner_id = ?",
-                new DataClassRowMapper<>(Address.class), ownerType, ownerId);
+        return jdbc.query(
+                "SELECT * FROM addresses WHERE owner_type = ? AND owner_id = ?",
+                new DataClassRowMapper<>(Address.class),
+                ownerType,
+                ownerId);
     }
 
     @PutMapping("/addresses/{id}")
-    Address update(@AuthenticationPrincipal Jwt jwt, @PathVariable Long id, @RequestBody Address address) {
+    Address update(
+            @AuthenticationPrincipal Jwt jwt, @PathVariable Long id, @RequestBody Address address) {
         requireOwner(jwt, byId(id).ownerId());
         requireOwner(jwt, address.ownerId());
         Coordinates coordinates = resolve(address);
         jdbc.update(
-                "UPDATE addresses SET owner_type = ?, owner_id = ?, street = ?, building_number = ?, "
-                        + "city = ?, postal_code = ?, lat = ?, lon = ? WHERE id = ?",
-                address.ownerType(), address.ownerId(), address.street(), address.buildingNumber(),
-                address.city(), address.postalCode(), coordinates.getLat(), coordinates.getLon(), id);
+                "UPDATE addresses SET owner_type = ?, owner_id = ?, street = ?, building_number ="
+                    + " ?, city = ?, postal_code = ?, lat = ?, lon = ? WHERE id = ?",
+                address.ownerType(),
+                address.ownerId(),
+                address.street(),
+                address.buildingNumber(),
+                address.city(),
+                address.postalCode(),
+                coordinates.getLat(),
+                coordinates.getLon(),
+                id);
         return byId(id);
     }
 
@@ -91,9 +120,13 @@ class AddressController {
     }
 
     @DeleteMapping("/addresses")
-    void deleteByOwner(@AuthenticationPrincipal Jwt jwt, @RequestParam String ownerType, @RequestParam String ownerId) {
+    void deleteByOwner(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam String ownerType,
+            @RequestParam String ownerId) {
         requireOwner(jwt, ownerId);
-        jdbc.update("DELETE FROM addresses WHERE owner_type = ? AND owner_id = ?", ownerType, ownerId);
+        jdbc.update(
+                "DELETE FROM addresses WHERE owner_type = ? AND owner_id = ?", ownerType, ownerId);
     }
 
     private static void requireOwner(Jwt jwt, String ownerId) {
@@ -104,33 +137,36 @@ class AddressController {
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    void addressNotFound() {
-    }
+    void addressNotFound() {}
 
     @ExceptionHandler(DuplicateKeyException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    void alreadyExists() {
-    }
+    void alreadyExists() {}
 
     @ExceptionHandler(StatusRuntimeException.class)
     ResponseEntity<Void> geocodingFailed(StatusRuntimeException e) {
-        return ResponseEntity.status(switch (e.getStatus().getCode()) {
-            case NOT_FOUND -> HttpStatus.UNPROCESSABLE_ENTITY;
-            case DEADLINE_EXCEEDED -> HttpStatus.GATEWAY_TIMEOUT;
-            default -> HttpStatus.BAD_GATEWAY;
-        }).build();
+        return ResponseEntity.status(
+                        switch (e.getStatus().getCode()) {
+                            case NOT_FOUND -> HttpStatus.UNPROCESSABLE_CONTENT;
+                            case DEADLINE_EXCEEDED -> HttpStatus.GATEWAY_TIMEOUT;
+                            default -> HttpStatus.BAD_GATEWAY;
+                        })
+                .build();
     }
 
     private Coordinates resolve(Address address) {
-        return geocoding.withDeadlineAfter(5, TimeUnit.SECONDS)
-                .geocode(GeocodeRequest.newBuilder()
-                        .setAddress(com.polyeats.geocoding.Address.newBuilder()
-                                .setStreet(address.street())
-                                .setBuildingNumber(address.buildingNumber())
-                                .setCity(address.city())
-                                .setPostalCode(address.postalCode())
+        return geocoding
+                .withDeadlineAfter(5, TimeUnit.SECONDS)
+                .geocode(
+                        GeocodeRequest.newBuilder()
+                                .setAddress(
+                                        com.polyeats.geocoding.Address.newBuilder()
+                                                .setStreet(address.street())
+                                                .setBuildingNumber(address.buildingNumber())
+                                                .setCity(address.city())
+                                                .setPostalCode(address.postalCode())
+                                                .build())
                                 .build())
-                        .build())
                 .getCoordinates();
     }
 }

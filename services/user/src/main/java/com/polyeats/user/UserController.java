@@ -1,8 +1,5 @@
 package com.polyeats.user;
 
-import java.net.SocketTimeoutException;
-import java.net.http.HttpTimeoutException;
-import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -24,11 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.net.SocketTimeoutException;
+import java.net.http.HttpTimeoutException;
+import java.util.List;
+
 @RestController
 class UserController {
 
-    record User(String accountId, String name, String email) {
-    }
+    record User(String accountId, String name, String email) {}
 
     private final JdbcTemplate jdbc;
     private final AddressClient addresses;
@@ -41,27 +41,35 @@ class UserController {
     }
 
     @GetMapping("/health")
-    void health() {
-    }
+    void health() {}
 
     @PostMapping("/users")
     User create(@AuthenticationPrincipal Jwt jwt, @RequestBody User user) {
-        jdbc.update("INSERT INTO users (account_id, name, email) VALUES (?, ?, ?)",
-                jwt.getSubject(), user.name(), user.email());
+        jdbc.update(
+                "INSERT INTO users (account_id, name, email) VALUES (?, ?, ?)",
+                jwt.getSubject(),
+                user.name(),
+                user.email());
         return byId(jwt.getSubject());
     }
 
     @GetMapping("/users/{id}")
     User byId(@PathVariable String id) {
-        return jdbc.queryForObject("SELECT * FROM users WHERE account_id = ?",
-                new DataClassRowMapper<>(User.class), id);
+        return jdbc.queryForObject(
+                "SELECT * FROM users WHERE account_id = ?",
+                new DataClassRowMapper<>(User.class),
+                id);
     }
 
     @PutMapping("/users/{id}")
     User update(@AuthenticationPrincipal Jwt jwt, @PathVariable String id, @RequestBody User user) {
         requireOwner(jwt, id);
         byId(id);
-        jdbc.update("UPDATE users SET name = ?, email = ? WHERE account_id = ?", user.name(), user.email(), id);
+        jdbc.update(
+                "UPDATE users SET name = ?, email = ? WHERE account_id = ?",
+                user.name(),
+                user.email(),
+                id);
         return byId(id);
     }
 
@@ -87,22 +95,22 @@ class UserController {
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    void userNotFound() {
-    }
+    void userNotFound() {}
 
     @ExceptionHandler(DuplicateKeyException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    void alreadyExists() {
-    }
+    void alreadyExists() {}
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    void invalidUser() {
-    }
+    void invalidUser() {}
 
     @ExceptionHandler(RestClientException.class)
     ResponseEntity<Void> addressFailed(RestClientException e) {
-        boolean timedOut = e.getCause() instanceof SocketTimeoutException || e.getCause() instanceof HttpTimeoutException;
-        return ResponseEntity.status(timedOut ? HttpStatus.GATEWAY_TIMEOUT : HttpStatus.BAD_GATEWAY).build();
+        boolean timedOut =
+                e.getCause() instanceof SocketTimeoutException
+                        || e.getCause() instanceof HttpTimeoutException;
+        return ResponseEntity.status(timedOut ? HttpStatus.GATEWAY_TIMEOUT : HttpStatus.BAD_GATEWAY)
+                .build();
     }
 }

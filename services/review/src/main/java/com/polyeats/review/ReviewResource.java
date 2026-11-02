@@ -1,6 +1,7 @@
 package com.polyeats.review;
 
 import io.quarkus.security.Authenticated;
+
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
@@ -15,27 +16,24 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
-import java.util.List;
+
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jboss.resteasy.reactive.ClientWebApplicationException;
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
+import java.util.List;
+
 @Path("/reviews")
 @Authenticated
 public class ReviewResource {
 
-    @Inject
-    JsonWebToken jwt;
+    @Inject JsonWebToken jwt;
 
-    @Inject
-    @RestClient
-    RestaurantClient restaurants;
+    @Inject @RestClient RestaurantClient restaurants;
 
-    @Inject
-    @RestClient
-    UserClient users;
+    @Inject @RestClient UserClient users;
 
     @POST
     @Transactional
@@ -82,7 +80,9 @@ public class ReviewResource {
 
     @DELETE
     @Transactional
-    public void deleteByOwner(@QueryParam("restaurantId") String restaurantId, @QueryParam("authorId") String authorId) {
+    public void deleteByOwner(
+            @QueryParam("restaurantId") String restaurantId,
+            @QueryParam("authorId") String authorId) {
         if (restaurantId != null && authorId != null) {
             throw new BadRequestException();
         }
