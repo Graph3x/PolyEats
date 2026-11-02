@@ -68,3 +68,24 @@ jobs:
           curl -fsSLo "$RUNNER_TEMP/pmd.zip" "https://github.com/pmd/pmd/releases/download/pmd_releases%2F$PMD_VERSION/pmd-dist-$PMD_VERSION-bin.zip"
           unzip -q "$RUNNER_TEMP/pmd.zip" -d "$RUNNER_TEMP"
           "$RUNNER_TEMP/pmd-bin-$PMD_VERSION/bin/pmd" check -R pmd.xml --file-list "$RUNNER_TEMP/java-files" --no-progress
+
+  stack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: start the containers
+        run: docker compose up -d --build --wait --wait-timeout 300
+
+      - name: run the testing workload
+        run: python infra/workload/run.py
+
+      - if: failure()
+        run: docker compose logs
+
+      - if: always()
+        run: docker compose down -v
