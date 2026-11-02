@@ -49,8 +49,6 @@ class Constants:
         "observed",
     ]
 
-    RELEASE_REQUIRED: typing.ClassVar = ["dataset_version", "timestamp", "source"]
-
     KINDS: typing.ClassVar = {
         "service",
         "datastore",

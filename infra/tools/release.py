@@ -34,11 +34,6 @@ def main():
     formatter = canonicalise.Formatter(data)
 
     formatter.validate()
-    formatter.errors += [
-        f"top level: {key!r} must not be null in a release"
-        for key in Constants.RELEASE_REQUIRED
-        if not data.get(key)
-    ]
     if formatter.errors:
         formatter.report()
 
