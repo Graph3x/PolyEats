@@ -61,8 +61,8 @@ class AddressController {
         Long id =
                 jdbc.queryForObject(
                         "INSERT INTO addresses (owner_type, owner_id, street, building_number,"
-                            + " city, postal_code, lat, lon) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-                            + " RETURNING id",
+                                + " city, postal_code, lat, lon) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                                + " RETURNING id",
                         Long.class,
                         address.ownerType(),
                         address.ownerId(),
@@ -100,7 +100,7 @@ class AddressController {
         Coordinates coordinates = resolve(address);
         jdbc.update(
                 "UPDATE addresses SET owner_type = ?, owner_id = ?, street = ?, building_number ="
-                    + " ?, city = ?, postal_code = ?, lat = ?, lon = ? WHERE id = ?",
+                        + " ?, city = ?, postal_code = ?, lat = ?, lon = ? WHERE id = ?",
                 address.ownerType(),
                 address.ownerId(),
                 address.street(),

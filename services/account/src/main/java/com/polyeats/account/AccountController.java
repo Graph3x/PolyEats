@@ -55,7 +55,7 @@ class AccountController {
     Identity register(@RequestBody Credentials credentials) {
         return jdbc.queryForObject(
                 "INSERT INTO accounts (email, password_hash) VALUES (?, ?) RETURNING account_id,"
-                    + " role, epoch",
+                        + " role, epoch",
                 new DataClassRowMapper<>(Identity.class),
                 credentials.email(),
                 passwords.encode(credentials.password()));
@@ -85,7 +85,7 @@ class AccountController {
         return jdbc
                 .query(
                         "SELECT account_id, password_hash, role, epoch FROM accounts WHERE email ="
-                            + " ?",
+                                + " ?",
                         new DataClassRowMapper<>(Stored.class),
                         credentials.email())
                 .stream()
