@@ -105,6 +105,28 @@ def test_serialise_orders_keys_sorts_nodes_and_ends_with_newline():
     assert output.endswith("}\n")
 
 
+def test_serialise_sorts_pattern_arrays():
+    data = document(
+        edges=[
+            edge(
+                caller="svc",
+                callee="svc",
+                type="rest",
+                pattern=["literal-url", "env-var-config", "client-wrapper"],
+            )
+        ]
+    )
+    formatter = Formatter(data)
+    formatter.complete()
+    parsed = json.loads(formatter.serialise())
+
+    assert parsed["edges"][0]["pattern"] == [
+        "client-wrapper",
+        "env-var-config",
+        "literal-url",
+    ]
+
+
 def test_serialise_is_idempotent():
     formatter = Formatter(document())
     formatter.complete()
