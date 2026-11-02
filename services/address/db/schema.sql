@@ -7,7 +7,6 @@ CREATE TABLE addresses (
   city            TEXT NOT NULL,
   postal_code     TEXT NOT NULL,
   lat             DOUBLE PRECISION NOT NULL,
-  lon             DOUBLE PRECISION NOT NULL
+  lon             DOUBLE PRECISION NOT NULL,
+  UNIQUE (owner_type, owner_id)
 );
-
-CREATE INDEX idx_addresses_owner ON addresses (owner_type, owner_id);

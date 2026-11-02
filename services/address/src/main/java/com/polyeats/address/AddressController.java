@@ -6,6 +6,7 @@ import com.polyeats.geocoding.GeocodingGrpc;
 import io.grpc.StatusRuntimeException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -98,6 +99,11 @@ class AddressController {
     @ExceptionHandler(EmptyResultDataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     void addressNotFound() {
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    void alreadyExists() {
     }
 
     @ExceptionHandler(StatusRuntimeException.class)
