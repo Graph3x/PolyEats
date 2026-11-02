@@ -225,6 +225,25 @@
       "observed": false
     },
     {
+      "id": "account.courier-profile.7e6922",
+      "caller": "account",
+      "caller_endpoint": "DELETE /accounts/{id}",
+      "callee": "courier-profile",
+      "callee_endpoint": "DELETE /couriers/{id}",
+      "type": "rest",
+      "pattern": [
+        "client-wrapper",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
       "id": "account.db:account.35d813",
       "caller": "account",
       "caller_endpoint": "PUT /accounts/{id}/password",
@@ -305,6 +324,44 @@
       "observed": false
     },
     {
+      "id": "account.restaurant.35faa0",
+      "caller": "account",
+      "caller_endpoint": "DELETE /accounts/{id}",
+      "callee": "restaurant",
+      "callee_endpoint": "DELETE /restaurants/{id}",
+      "type": "rest",
+      "pattern": [
+        "client-wrapper",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "account.user.9473b7",
+      "caller": "account",
+      "caller_endpoint": "DELETE /accounts/{id}",
+      "callee": "user",
+      "callee_endpoint": "DELETE /users/{id}",
+      "type": "rest",
+      "pattern": [
+        "client-wrapper",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
       "id": "address.auth.997ab8",
       "caller": "address",
       "caller_endpoint": null,
@@ -314,6 +371,22 @@
       "pattern": [
         "env-var-config"
       ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "address.db:address.372ba9",
+      "caller": "address",
+      "caller_endpoint": "DELETE /addresses",
+      "callee": "db:address",
+      "callee_endpoint": "addresses",
+      "type": "query",
+      "pattern": null,
       "routing_key": null,
       "headers": null,
       "selector": null,
@@ -1364,6 +1437,25 @@
       "observed": false
     },
     {
+      "id": "restaurant.address.52190b",
+      "caller": "restaurant",
+      "caller_endpoint": "DELETE /restaurants/{id}",
+      "callee": "address",
+      "callee_endpoint": "DELETE /addresses",
+      "type": "rest",
+      "pattern": [
+        "client-wrapper",
+        "literal-url"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
       "id": "restaurant.address.90f360",
       "caller": "restaurant",
       "caller_endpoint": "GET /restaurants/{id}/addresses",
@@ -1497,6 +1589,25 @@
       "observed": false
     },
     {
+      "id": "restaurant.review.309c98",
+      "caller": "restaurant",
+      "caller_endpoint": "DELETE /restaurants/{id}",
+      "callee": "review",
+      "callee_endpoint": "DELETE /reviews",
+      "type": "rest",
+      "pattern": [
+        "client-wrapper",
+        "literal-url"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
       "id": "review.auth.997ab8",
       "caller": "review",
       "caller_endpoint": null,
@@ -1506,6 +1617,22 @@
       "pattern": [
         "env-var-config"
       ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "review.db:review.2413e2",
+      "caller": "review",
+      "caller_endpoint": "DELETE /reviews",
+      "callee": "db:review",
+      "callee_endpoint": "reviews",
+      "type": "query",
+      "pattern": null,
       "routing_key": null,
       "headers": null,
       "selector": null,
@@ -1652,6 +1779,25 @@
       "observed": false
     },
     {
+      "id": "user.address.e86ba9",
+      "caller": "user",
+      "caller_endpoint": "DELETE /users/{id}",
+      "callee": "address",
+      "callee_endpoint": "DELETE /addresses",
+      "type": "rest",
+      "pattern": [
+        "client-wrapper",
+        "literal-url"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
       "id": "user.auth.997ab8",
       "caller": "user",
       "caller_endpoint": null,
@@ -1750,45 +1896,16 @@
       "observed": false
     },
     {
-      "id": "",
-      "caller": "account",
-      "caller_endpoint": "DELETE /accounts/{id}",
-      "callee": "user",
-      "callee_endpoint": "DELETE /users/{id}",
+      "id": "user.review.8deae3",
+      "caller": "user",
+      "caller_endpoint": "DELETE /users/{id}",
+      "callee": "review",
+      "callee_endpoint": "DELETE /reviews",
       "type": "rest",
-      "pattern": ["client-wrapper", "lookup-table"],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "account",
-      "caller_endpoint": "DELETE /accounts/{id}",
-      "callee": "restaurant",
-      "callee_endpoint": "DELETE /restaurants/{id}",
-      "type": "rest",
-      "pattern": ["client-wrapper", "lookup-table"],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "account",
-      "caller_endpoint": "DELETE /accounts/{id}",
-      "callee": "courier-profile",
-      "callee_endpoint": "DELETE /couriers/{id}",
-      "type": "rest",
-      "pattern": ["client-wrapper", "lookup-table"],
+      "pattern": [
+        "client-wrapper",
+        "literal-url"
+      ],
       "routing_key": null,
       "headers": null,
       "selector": null,
