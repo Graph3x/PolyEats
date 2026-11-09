@@ -2,10 +2,11 @@ import os
 
 import geocoding_pb2
 import geocoding_pb2_grpc
+import grpc
 import uvicorn
 from auth import verify
 from clients import grpc_channel
-from fastapi import Depends, FastAPI, Response
+from fastapi import Depends, FastAPI, Request, Response
 
 TIMEOUT = 5.0
 
@@ -19,6 +20,12 @@ geocoding = geocoding_pb2_grpc.GeocodingStub(grpc_channel(os.environ["GEOCODING_
 @app.get("/health")
 def health():
     return Response(status_code=200)
+
+
+@app.exception_handler(grpc.RpcError)
+def geocoding_failed(request: Request, e: grpc.RpcError):
+    timed_out = e.code() == grpc.StatusCode.DEADLINE_EXCEEDED
+    return Response(status_code=504 if timed_out else 502)
 
 
 @app.get("/tracking/{order_id}")
