@@ -93,6 +93,8 @@ gRPC clients use the default `pick_first` load balancing, so each client sends a
 ### Code duplication
 Some code, such as the JWT verifier, is deliberately copied into each service instead of shared as a library. Every service then makes the call itself, which gives more and more varied edges than a single shared implementation would. The copies have to be kept in sync by hand.
 
+### Synchronous cascading deletes
+The cascading deletes are currently implemented synchronously, meaning failed downstream calls might leave data in an inconsistent state that requires a retry.
 
 ## License
 
