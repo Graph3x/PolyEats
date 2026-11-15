@@ -1,0 +1,13 @@
+# Dockerfile template — Python services (FastAPI or Flask).
+
+ARG PYTHON_VERSION=3.14
+
+FROM python:${PYTHON_VERSION}-slim
+COPY --from=busybox:1.37-musl /bin/busybox /bin/wget
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+USER nobody
+ENTRYPOINT ["opentelemetry-instrument"]
+CMD ["python", "app.py"]

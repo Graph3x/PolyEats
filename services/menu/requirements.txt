@@ -1,0 +1,9 @@
+fastapi==0.141.1
+opentelemetry-distro==0.65b0
+opentelemetry-exporter-otlp==1.44.0
+opentelemetry-instrumentation-fastapi==0.65b0
+opentelemetry-instrumentation-pymongo==0.65b0
+opentelemetry-instrumentation-urllib==0.65b0
+pymongo==4.19.0
+uvicorn==0.52.4
+pyjwt[crypto]==2.15.1
