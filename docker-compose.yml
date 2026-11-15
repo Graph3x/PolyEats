@@ -221,3 +221,29 @@ services:
     healthcheck: *healthcheck
     networks:
       - polyeats
+
+  menu-mongo:
+    image: mongo:8.2
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: menu
+      MONGO_INITDB_ROOT_PASSWORD: menu
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - polyeats
+
+  menu:
+    build: ./services/menu
+    depends_on:
+      menu-mongo:
+        condition: service_healthy
+    environment:
+      <<: [*otel, *jwks]
+      OTEL_SERVICE_NAME: menu
+      MONGO_URL: mongodb://menu:menu@menu-mongo:27017/?authSource=admin
+    healthcheck: *healthcheck
+    networks:
+      - polyeats
