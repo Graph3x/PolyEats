@@ -197,8 +197,9 @@ services:
 
   auth-valkey:
     image: valkey/valkey:9.1
+    command: ["valkey-server", "--requirepass", "auth"]
     healthcheck:
-      test: ["CMD", "valkey-cli", "ping"]
+      test: ["CMD", "valkey-cli", "--no-auth-warning", "-a", "auth", "ping"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -214,6 +215,7 @@ services:
       <<: *otel
       OTEL_SERVICE_NAME: auth
       VALKEY_ADDR: auth-valkey:6379
+      VALKEY_PASSWORD: auth
       ACCOUNT_URL: http://account:8080
       JWT_KEY_PATH: /keys/dev.pem
     volumes:
