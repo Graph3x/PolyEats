@@ -20,6 +20,7 @@ var routes = map[string]string{
 	"account":         "http://account:8080",
 	"courier-profile": "http://courier-profile:8080",
 	"review":          "http://review:8080",
+	"menu":            "http://menu:8080",
 }
 
 var publicRoutes = map[string][]string{
