@@ -4,7 +4,7 @@ import geocoding_pb2
 import geocoding_pb2_grpc
 import grpc
 import uvicorn
-from auth import verify
+from auth import Caller, verify
 from clients import grpc_channel
 from fastapi import Depends, FastAPI, Request, Response
 
@@ -29,13 +29,13 @@ def geocoding_failed(request: Request, e: grpc.RpcError):
 
 
 @app.get("/tracking/{order_id}")
-def tracking(order_id: str, authorization: str = Depends(verify)):
+def tracking(order_id: str, caller: Caller = Depends(verify)):
     latitude, longitude = COURIER_POSITION
     request = geocoding_pb2.ReverseGeocodeRequest(
         coordinates=geocoding_pb2.Coordinates(lat=latitude, lon=longitude)
     )
     address = geocoding.ReverseGeocode(
-        request, timeout=TIMEOUT, metadata=[("authorization", authorization)]
+        request, timeout=TIMEOUT, metadata=[("authorization", f"Bearer {caller.token}")]
     ).address
     return {
         "orderId": order_id,
