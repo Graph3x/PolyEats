@@ -1,4 +1,5 @@
 import os
+from typing import Annotated
 
 import geocoding_pb2
 import geocoding_pb2_grpc
@@ -29,7 +30,7 @@ def geocoding_failed(request: Request, e: grpc.RpcError):
 
 
 @app.get("/tracking/{order_id}")
-def tracking(order_id: str, caller: Caller = Depends(verify)):
+def tracking(order_id: str, caller: Annotated[Caller, Depends(verify)]):
     latitude, longitude = COURIER_POSITION
     request = geocoding_pb2.ReverseGeocodeRequest(
         coordinates=geocoding_pb2.Coordinates(lat=latitude, lon=longitude)
