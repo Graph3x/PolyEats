@@ -1,4 +1,5 @@
 import os
+from dataclasses import dataclass
 
 import jwt
 from fastapi import Header, HTTPException
@@ -12,21 +13,27 @@ jwks = jwt.PyJWKClient(
 )
 
 
-def verify(authorization: str = Header("")) -> str:
+@dataclass(frozen=True)
+class Caller:
+    subject: str
+    token: str
+
+
+def verify(authorization: str = Header("")) -> Caller:
     if not authorization.startswith("Bearer "):
         raise HTTPException(401, headers=BEARER_CHALLENGE)
     token = authorization.removeprefix("Bearer ")
     try:
         key = jwks.get_signing_key_from_jwt(token).key
-        jwt.decode(
+        claims = jwt.decode(
             token,
             key,
             algorithms=["RS256"],
             issuer=JWT_ISSUER,
-            options={"require": ["exp"]},
+            options={"require": ["exp", "sub"]},
         )
     except PyJWKClientConnectionError:
         raise HTTPException(503)
     except PyJWTError:
         raise HTTPException(401, headers=BEARER_CHALLENGE)
-    return authorization
+    return Caller(claims["sub"], token)
