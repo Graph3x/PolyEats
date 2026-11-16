@@ -33,11 +33,14 @@ class RestaurantController {
     private final JdbcTemplate jdbc;
     private final AddressClient addresses;
     private final ReviewClient reviews;
+    private final MenuClient menu;
 
-    RestaurantController(JdbcTemplate jdbc, AddressClient addresses, ReviewClient reviews) {
+    RestaurantController(
+            JdbcTemplate jdbc, AddressClient addresses, ReviewClient reviews, MenuClient menu) {
         this.jdbc = jdbc;
         this.addresses = addresses;
         this.reviews = reviews;
+        this.menu = menu;
     }
 
     @GetMapping("/health")
@@ -92,6 +95,7 @@ class RestaurantController {
         requireOwner(jwt, id);
         reviews.deleteByRestaurant(id);
         addresses.deleteByRestaurant(id);
+        menu.deleteByRestaurant(id);
         jdbc.update("DELETE FROM restaurants WHERE account_id = ?", id);
     }
 
