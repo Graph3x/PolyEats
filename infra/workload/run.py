@@ -137,6 +137,34 @@ def restaurant():
     call("DELETE", mine, token=token)
 
 
+def menu():
+    tokens = login()
+    if not tokens:
+        return
+    token = tokens["access_token"]
+
+    items = f"{GATEWAY}/menu/items"
+    dish = {"restaurantId": customer_id, "name": "Svickova", "price": 18900}
+
+    created = call("POST", items, dish, token=token)
+    call("POST", items, dish | {"price": -1}, expect=400, token=token)
+    call("POST", items, dish | {"restaurantId": "acc-other"}, expect=403, token=token)
+    if created:
+        mine = f"{items}/{created['id']}"
+        call("GET", mine, token=token)
+        call("PUT", mine, dish | {"available": False}, token=token)
+        call("DELETE", mine, token=token)
+        call("GET", mine, expect=404, token=token)
+
+    call("GET", f"{items}?restaurantId={customer_id}", token=token)
+    call("DELETE", f"{items}?restaurantId={customer_id}", token=token)
+
+    leftover = call("POST", items, dish, token=token)
+    call("DELETE", f"{GATEWAY}/restaurant/restaurants/{customer_id}", token=token)
+    if leftover:
+        call("GET", f"{items}/{leftover['id']}", expect=404, token=token)
+
+
 def courier_profile():
     tokens = login()
     if not tokens:
@@ -241,6 +269,7 @@ SERVICES = [
     address,
     user,
     restaurant,
+    menu,
     courier_profile,
     review,
     gateway,
