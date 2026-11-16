@@ -96,7 +96,11 @@ def table(attrs):
     if attrs.get("db.system") == "valkey":
         key = (attrs.get("db.statement") or "").partition(" ")[2]
         return key.split(":")[0] or None
-    name = attrs.get("db.collection.name") or attrs.get("db.sql.table")
+    name = (
+        attrs.get("db.collection.name")
+        or attrs.get("db.mongodb.collection")
+        or attrs.get("db.sql.table")
+    )
     if name:
         return name
     match = TABLE.search(attrs.get("db.query.text") or attrs.get("db.statement") or "")
