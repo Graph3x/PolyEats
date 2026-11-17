@@ -24,7 +24,7 @@ jobs:
         run: python infra/workload/run.py
 
       - name: wait for collector flush
-        run: sleep 5
+        run: sleep 15
 
       - name: mark observed traces in connections.json
         run: python infra/tools/observe.py traces/traces.jsonl dataset/connections.json
