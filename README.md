@@ -87,6 +87,9 @@ The project currently doesn't encrypt its traffic with TLS.
 ### Committed private key
 The auth service uses a committed static private key. This is clearly not a production-ready setup, but it simplifies testing and deployment.
 
+### Development webservers
+Some services run on development webservers that aren't meant for production use.
+
 ### gRPC load balancing
 gRPC clients use the default `pick_first` load balancing, so each client sends all of its traffic to a single replica of a scaled service. This doesn't matter for the current single-instance setup.
 

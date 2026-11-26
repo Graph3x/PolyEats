@@ -22,6 +22,10 @@ CREATE ROLE review LOGIN PASSWORD 'review';
 CREATE DATABASE review OWNER review;
 REVOKE CONNECT ON DATABASE review FROM PUBLIC;
 
+CREATE ROLE promotion LOGIN PASSWORD 'promotion';
+CREATE DATABASE promotion OWNER promotion;
+REVOKE CONNECT ON DATABASE promotion FROM PUBLIC;
+
 \c address
 SET ROLE address;
 \i /schemas/address.sql
@@ -45,3 +49,7 @@ SET ROLE "courier-profile";
 \c review
 SET ROLE review;
 \i /schemas/review.sql
+
+\c promotion
+SET ROLE promotion;
+\i /schemas/promotion.sql

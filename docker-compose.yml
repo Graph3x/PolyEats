@@ -65,6 +65,7 @@ services:
       - ./services/account/db/schema.sql:/schemas/account.sql:ro
       - ./services/courier-profile/db/schema.sql:/schemas/courier-profile.sql:ro
       - ./services/review/db/schema.sql:/schemas/review.sql:ro
+      - ./services/promotion/db/schema.sql:/schemas/promotion.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h localhost -U polyeats"]
       interval: 5s
@@ -246,6 +247,23 @@ services:
       <<: [*otel, *jwks]
       OTEL_SERVICE_NAME: menu
       MONGO_URL: mongodb://menu:menu@menu-mongo:27017/?authSource=admin
+    healthcheck: *healthcheck
+    networks:
+      - polyeats
+
+  promotion:
+    build: ./services/promotion
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: [*otel, *jwks]
+      OTEL_SERVICE_NAME: promotion
+      POSTGRES_URL: postgresql://postgres:5432/promotion
+      POSTGRES_USER: promotion
+      POSTGRES_PASSWORD: promotion
+      USER_URL: http://user:8080
+      RESTAURANT_URL: http://restaurant:8080
     healthcheck: *healthcheck
     networks:
       - polyeats
