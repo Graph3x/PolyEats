@@ -225,6 +225,28 @@
       "native_name": null,
       "routing": null,
       "delivery": null
+    },
+    {
+      "id": "promotion",
+      "kind": "service",
+      "language": "python",
+      "stack": "flask",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
+    },
+    {
+      "id": "db:promotion",
+      "kind": "datastore",
+      "language": null,
+      "stack": "postgres",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
     }
   ],
   "edges": [
@@ -2175,6 +2197,97 @@
         "client-wrapper",
         "literal-url"
       ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "promotion",
+      "caller_endpoint": "GET /promotions/eligible",
+      "callee": "restaurant",
+      "callee_endpoint": "GET /restaurants/{id}",
+      "type": "rest",
+      "pattern": [
+        "env-var-config",
+        "string-concatenation"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "promotion",
+      "caller_endpoint": "GET /promotions/eligible",
+      "callee": "restaurant",
+      "callee_endpoint": "GET /restaurants/{id}/addresses",
+      "type": "rest",
+      "pattern": [
+        "env-var-config",
+        "string-concatenation"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "promotion",
+      "caller_endpoint": "GET /promotions/eligible",
+      "callee": "user",
+      "callee_endpoint": "GET /users/{id}/addresses",
+      "type": "rest",
+      "pattern": [
+        "env-var-config",
+        "string-concatenation"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "promotion",
+      "caller_endpoint": null,
+      "callee": "auth",
+      "callee_endpoint": "GET /.well-known/jwks.json",
+      "type": "rest",
+      "pattern": [
+        "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "promotion",
+      "caller_endpoint": "GET /promotions/eligible",
+      "callee": "db:promotion",
+      "callee_endpoint": "promotions",
+      "type": "query",
+      "pattern": null,
       "routing_key": null,
       "headers": null,
       "selector": null,
