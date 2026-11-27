@@ -11,6 +11,7 @@ from schema_constants import Constants
 
 SERVER, CLIENT = 2, 3
 SUPPORTED_TYPES = {"rest", "grpc", "query"}
+KEY_VALUE = {"redis", "valkey"}
 TABLE = re.compile(r"\b(?:FROM|INTO|UPDATE|JOIN)\s+([\w.]+)", re.IGNORECASE)
 
 
@@ -93,9 +94,6 @@ def forwarded_endpoints(collected, by_key, servers):
 
 
 def table(attrs):
-    if attrs.get("db.system") == "valkey":
-        key = (attrs.get("db.statement") or "").partition(" ")[2]
-        return key.split(":")[0] or None
     name = (
         attrs.get("db.collection.name")
         or attrs.get("db.mongodb.collection")
@@ -109,10 +107,14 @@ def table(attrs):
 
 def callee(client_span: dict, servers: dict):
     attrs = client_span["attributes"]
-    if "db.system" in attrs or "db.system.name" in attrs:
+    system = attrs.get("db.system") or attrs.get("db.system.name")
+    # Every service owns its datastore, and sqlite spans carry no database name.
+    datastore = f"db:{client_span['service']}"
+    if system in KEY_VALUE:
+        return "query", datastore, None
+    if system:
         name = table(attrs)
-        # Every service owns its datastore, and sqlite spans carry no database name.
-        return name and ("query", f"db:{client_span['service']}", name)
+        return name and ("query", datastore, name)
 
     server = servers.get(client_span["key"])
     if server is None:

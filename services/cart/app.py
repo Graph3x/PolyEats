@@ -24,10 +24,6 @@ class Line(BaseModel):
     quantity: int = Field(ge=1, strict=True)
 
 
-def key(account_id: str) -> str:
-    return f"cart:{account_id}"
-
-
 def require_owner(caller: Caller, account_id: str) -> None:
     if caller.subject != account_id:
         raise HTTPException(403)
@@ -75,7 +71,7 @@ def health():
 def get_cart(account_id: str, caller: Annotated[Caller, Depends(verify)]):
     require_owner(caller, account_id)
     groups: dict[str, list[dict[str, Any]]] = {}
-    for item_id, stored in store.hgetall(key(account_id)).items():
+    for item_id, stored in store.hgetall(account_id).items():
         line = json.loads(stored)
         groups.setdefault(line["restaurantId"], []).append(
             {"itemId": item_id, "quantity": line["quantity"]}
@@ -108,8 +104,8 @@ def put_item(
         {"restaurantId": item["restaurantId"], "quantity": line.quantity}
     )
     with store.pipeline() as transaction:
-        transaction.hset(key(account_id), item_id, stored)
-        transaction.expire(key(account_id), TTL)
+        transaction.hset(account_id, item_id, stored)
+        transaction.expire(account_id, TTL)
         transaction.execute()
     return Response(status_code=200)
 
@@ -119,14 +115,14 @@ def delete_item(
     account_id: str, item_id: str, caller: Annotated[Caller, Depends(verify)]
 ):
     require_owner(caller, account_id)
-    store.hdel(key(account_id), item_id)
+    store.hdel(account_id, item_id)
     return Response(status_code=200)
 
 
 @app.delete("/carts/{account_id}")
 def delete_cart(account_id: str, caller: Annotated[Caller, Depends(verify)]):
     require_owner(caller, account_id)
-    store.delete(key(account_id))
+    store.delete(account_id)
     return Response(status_code=200)
 
 

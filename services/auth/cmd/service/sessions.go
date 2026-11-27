@@ -23,10 +23,6 @@ type session struct {
 	Hash      string `json:"hash"`
 }
 
-func sessionKey(familyID string) string {
-	return "session:" + familyID
-}
-
 func hashSecret(secret string) string {
 	sum := sha256.Sum256([]byte(secret))
 	return b64(sum[:])
@@ -37,12 +33,12 @@ func (s *authServer) createSession(ctx context.Context, familyID string, sess se
 	if err != nil {
 		return err
 	}
-	return s.store.Do(ctx, s.store.B().Set().Key(sessionKey(familyID)).Value(string(value)).Ex(sessionTTL).Build()).Error()
+	return s.store.Do(ctx, s.store.B().Set().Key(familyID).Value(string(value)).Ex(sessionTTL).Build()).Error()
 }
 
 func getSession(ctx context.Context, c valkey.CoreClient, familyID string) (session, error) {
 	var sess session
-	raw, err := c.Do(ctx, c.B().Get().Key(sessionKey(familyID)).Build()).AsBytes()
+	raw, err := c.Do(ctx, c.B().Get().Key(familyID).Build()).AsBytes()
 	if valkey.IsValkeyNil(err) {
 		return sess, errSessionNotFound
 	}
@@ -54,9 +50,8 @@ func getSession(ctx context.Context, c valkey.CoreClient, familyID string) (sess
 
 // WATCH makes EXEC abort if a concurrent refresh rotated the session first.
 func (s *authServer) rotateSession(ctx context.Context, familyID, oldHash, newHash string) error {
-	key := sessionKey(familyID)
 	return s.store.Dedicated(func(c valkey.DedicatedClient) error {
-		if err := c.Do(ctx, c.B().Watch().Key(key).Build()).Error(); err != nil {
+		if err := c.Do(ctx, c.B().Watch().Key(familyID).Build()).Error(); err != nil {
 			return err
 		}
 		sess, err := getSession(ctx, c, familyID)
@@ -76,7 +71,7 @@ func (s *authServer) rotateSession(ctx context.Context, familyID, oldHash, newHa
 		}
 		res := c.DoMulti(ctx,
 			c.B().Multi().Build(),
-			c.B().Set().Key(key).Value(string(value)).Keepttl().Build(),
+			c.B().Set().Key(familyID).Value(string(value)).Keepttl().Build(),
 			c.B().Exec().Build(),
 		)
 		err = res[len(res)-1].Error()
@@ -88,5 +83,5 @@ func (s *authServer) rotateSession(ctx context.Context, familyID, oldHash, newHa
 }
 
 func (s *authServer) deleteSession(ctx context.Context, familyID string) error {
-	return s.store.Do(ctx, s.store.B().Del().Key(sessionKey(familyID)).Build()).Error()
+	return s.store.Do(ctx, s.store.B().Del().Key(familyID).Build()).Error()
 }
