@@ -278,3 +278,29 @@ services:
     healthcheck: *healthcheck
     networks:
       - polyeats
+
+  cart-valkey:
+    image: valkey/valkey:9.1
+    command: ["valkey-server", "--requirepass", "cart"]
+    healthcheck:
+      test: ["CMD", "valkey-cli", "--no-auth-warning", "-a", "cart", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - polyeats
+
+  cart:
+    build: ./services/cart
+    depends_on:
+      cart-valkey:
+        condition: service_healthy
+    environment:
+      <<: [*otel, *jwks]
+      OTEL_SERVICE_NAME: cart
+      VALKEY_URL: redis://:cart@cart-valkey:6379
+      MENU_URL: http://menu:8080
+      PRICING_URL: http://pricing:8080
+    healthcheck: *healthcheck
+    networks:
+      - polyeats
