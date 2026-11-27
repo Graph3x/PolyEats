@@ -12,6 +12,10 @@ from schema_constants import Constants
 SERVER, CLIENT = 2, 3
 SUPPORTED_TYPES = {"rest", "grpc", "query"}
 KEY_VALUE = {"redis", "valkey"}
+EXTERNAL = {
+    "api.payments.example": "payment-external-stub",
+    "push.notify.example": "notify-external-stub",
+}
 TABLE = re.compile(r"\b(?:FROM|INTO|UPDATE|JOIN)\s+([\w.]+)", re.IGNORECASE)
 
 
@@ -105,6 +109,12 @@ def table(attrs):
     return match and match.group(1)
 
 
+def external(attrs):
+    url = urlsplit(attrs.get("http.url", ""))
+    node = EXTERNAL.get(url.hostname)
+    return node and ("rest", node, f"{attrs['http.method']} {url.path}")
+
+
 def callee(client_span: dict, servers: dict):
     attrs = client_span["attributes"]
     system = attrs.get("db.system") or attrs.get("db.system.name")
@@ -118,7 +128,7 @@ def callee(client_span: dict, servers: dict):
 
     server = servers.get(client_span["key"])
     if server is None:
-        return None
+        return external(attrs)
     edge_type = "grpc" if "rpc.method" in attrs else "rest"
     return edge_type, server["service"], endpoint(server)
 

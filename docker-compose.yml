@@ -304,3 +304,12 @@ services:
     healthcheck: *healthcheck
     networks:
       - polyeats
+
+  external:
+    build: ./infra/external
+    healthcheck: *healthcheck
+    networks:
+      polyeats:
+        aliases:
+          - api.payments.example
+          - push.notify.example
