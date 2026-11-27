@@ -98,7 +98,7 @@ kinds that use them.
 | `caller` | string | all | node id |
 | `caller_endpoint` | string \| null | all | endpoint the call originates from; null for service-wide edges |
 | `callee` | string | all | node id |
-| `callee_endpoint` | string \| null | all but destination-targeting | endpoint, or table / collection / key prefix for `query` |
+| `callee_endpoint` | string \| null | all but destination-targeting | endpoint, or table / collection for `query`; null for a key-value store |
 | `type` | enum | all | |
 | `pattern` | enum array \| null | `rest`, `grpc`, `grpc-stream` | |
 | `routing_key` | string \| null | `async` service→destination | |
@@ -188,7 +188,7 @@ This is mostly generalization readiness and primarily internal only, SAR tools a
 
 ## Operation naming
 
-Both `caller_endpoint` and `callee_endpoint` use these forms, so an edge's `callee_endpoint` matches the next edge's `caller_endpoint` by string equality. `query` edges are the exception: their `callee_endpoint` is a table or collection name, or the key prefix for a key-value store (`session` for `session:{id}`), not an operation.
+Both `caller_endpoint` and `callee_endpoint` use these forms, so an edge's `callee_endpoint` matches the next edge's `caller_endpoint` by string equality. `query` edges are the exception: their `callee_endpoint` is a table or collection name, not an operation. For a key-value store it is `null`, since its instrumentation does not reliably report the key; services use one keyspace per instance, and finer-grained key-value access is not represented.
 
 | Origin | Form |
 |---|---|

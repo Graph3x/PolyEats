@@ -40,6 +40,17 @@
       "delivery": null
     },
     {
+      "id": "cart",
+      "kind": "service",
+      "language": "python",
+      "stack": "fastapi",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
+    },
+    {
       "id": "courier-profile",
       "kind": "service",
       "language": "java",
@@ -84,6 +95,17 @@
       "delivery": null
     },
     {
+      "id": "db:cart",
+      "kind": "datastore",
+      "language": null,
+      "stack": "valkey",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
+    },
+    {
       "id": "db:courier-profile",
       "kind": "datastore",
       "language": null,
@@ -110,6 +132,17 @@
       "kind": "datastore",
       "language": null,
       "stack": "mongodb",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
+    },
+    {
+      "id": "db:promotion",
+      "kind": "datastore",
+      "language": null,
+      "stack": "postgres",
       "broker": null,
       "native_kind": null,
       "native_name": null,
@@ -194,6 +227,28 @@
       "delivery": null
     },
     {
+      "id": "pricing",
+      "kind": "service",
+      "language": "python",
+      "stack": "flask",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
+    },
+    {
+      "id": "promotion",
+      "kind": "service",
+      "language": "python",
+      "stack": "flask",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
+    },
+    {
       "id": "restaurant",
       "kind": "service",
       "language": "java",
@@ -220,39 +275,6 @@
       "kind": "service",
       "language": "java",
       "stack": "spring-boot",
-      "broker": null,
-      "native_kind": null,
-      "native_name": null,
-      "routing": null,
-      "delivery": null
-    },
-    {
-      "id": "promotion",
-      "kind": "service",
-      "language": "python",
-      "stack": "flask",
-      "broker": null,
-      "native_kind": null,
-      "native_name": null,
-      "routing": null,
-      "delivery": null
-    },
-    {
-      "id": "db:promotion",
-      "kind": "datastore",
-      "language": null,
-      "stack": "postgres",
-      "broker": null,
-      "native_kind": null,
-      "native_name": null,
-      "routing": null,
-      "delivery": null
-    },
-    {
-      "id": "pricing",
-      "kind": "service",
-      "language": "python",
-      "stack": "flask",
       "broker": null,
       "native_kind": null,
       "native_name": null,
@@ -611,45 +633,165 @@
       "observed": false
     },
     {
-      "id": "auth.db:auth.6dabb6",
-      "caller": "auth",
-      "caller_endpoint": "Auth/Refresh",
-      "callee": "db:auth",
-      "callee_endpoint": "session",
-      "type": "query",
-      "pattern": null,
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "auth.db:auth.779d86",
-      "caller": "auth",
-      "caller_endpoint": "Auth/Login",
-      "callee": "db:auth",
-      "callee_endpoint": "session",
-      "type": "query",
-      "pattern": null,
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "auth.db:auth.de25b7",
+      "id": "auth.db:auth.67caab",
       "caller": "auth",
       "caller_endpoint": "Auth/Logout",
       "callee": "db:auth",
-      "callee_endpoint": "session",
+      "callee_endpoint": null,
       "type": "query",
       "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "auth.db:auth.9e8e1b",
+      "caller": "auth",
+      "caller_endpoint": "Auth/Refresh",
+      "callee": "db:auth",
+      "callee_endpoint": null,
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "auth.db:auth.faa0fb",
+      "caller": "auth",
+      "caller_endpoint": "Auth/Login",
+      "callee": "db:auth",
+      "callee_endpoint": null,
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "cart.auth.997ab8",
+      "caller": "cart",
+      "caller_endpoint": null,
+      "callee": "auth",
+      "callee_endpoint": "GET /.well-known/jwks.json",
+      "type": "rest",
+      "pattern": [
+        "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "cart.db:cart.062180",
+      "caller": "cart",
+      "caller_endpoint": "DELETE /carts/{account_id}",
+      "callee": "db:cart",
+      "callee_endpoint": null,
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "cart.db:cart.204574",
+      "caller": "cart",
+      "caller_endpoint": "DELETE /carts/{account_id}/items/{item_id}",
+      "callee": "db:cart",
+      "callee_endpoint": null,
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "cart.db:cart.6e7830",
+      "caller": "cart",
+      "caller_endpoint": "GET /carts/{account_id}",
+      "callee": "db:cart",
+      "callee_endpoint": null,
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "cart.db:cart.8bd13e",
+      "caller": "cart",
+      "caller_endpoint": "PUT /carts/{account_id}/items/{item_id}",
+      "callee": "db:cart",
+      "callee_endpoint": null,
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "cart.menu.456ee0",
+      "caller": "cart",
+      "caller_endpoint": "PUT /carts/{account_id}/items/{item_id}",
+      "callee": "menu",
+      "callee_endpoint": "GET /items/{item_id}",
+      "type": "rest",
+      "pattern": [
+        "env-var-config",
+        "string-concatenation"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "cart.pricing.d2d01a",
+      "caller": "cart",
+      "caller_endpoint": "GET /carts/{account_id}",
+      "callee": "pricing",
+      "callee_endpoint": "POST /price",
+      "type": "rest",
+      "pattern": [
+        "env-var-config",
+        "string-concatenation"
+      ],
       "routing_key": null,
       "headers": null,
       "selector": null,
@@ -976,6 +1118,82 @@
       "pattern": [
         "closure-captured",
         "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.cart.0aae6c",
+      "caller": "gateway",
+      "caller_endpoint": "GET /cart/carts/{account_id}",
+      "callee": "cart",
+      "callee_endpoint": "GET /carts/{account_id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.cart.0c9b96",
+      "caller": "gateway",
+      "caller_endpoint": "DELETE /cart/carts/{account_id}/items/{item_id}",
+      "callee": "cart",
+      "callee_endpoint": "DELETE /carts/{account_id}/items/{item_id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.cart.1baa9f",
+      "caller": "gateway",
+      "caller_endpoint": "PUT /cart/carts/{account_id}/items/{item_id}",
+      "callee": "cart",
+      "callee_endpoint": "PUT /carts/{account_id}/items/{item_id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "gateway.cart.7c2d05",
+      "caller": "gateway",
+      "caller_endpoint": "DELETE /cart/carts/{account_id}",
+      "callee": "cart",
+      "callee_endpoint": "DELETE /carts/{account_id}",
+      "type": "rest",
+      "pattern": [
+        "closure-captured",
+        "lookup-table"
       ],
       "routing_key": null,
       "headers": null,
@@ -1720,6 +1938,153 @@
       "observed": false
     },
     {
+      "id": "pricing.auth.997ab8",
+      "caller": "pricing",
+      "caller_endpoint": null,
+      "callee": "auth",
+      "callee_endpoint": "GET /.well-known/jwks.json",
+      "type": "rest",
+      "pattern": [
+        "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "pricing.menu.101e66",
+      "caller": "pricing",
+      "caller_endpoint": "POST /price",
+      "callee": "menu",
+      "callee_endpoint": "GET /items",
+      "type": "rest",
+      "pattern": [
+        "env-var-config",
+        "string-concatenation"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "pricing.promotion.8456d5",
+      "caller": "pricing",
+      "caller_endpoint": "POST /price",
+      "callee": "promotion",
+      "callee_endpoint": "GET /promotions/eligible",
+      "type": "rest",
+      "pattern": [
+        "env-var-config",
+        "string-concatenation"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "promotion.auth.997ab8",
+      "caller": "promotion",
+      "caller_endpoint": null,
+      "callee": "auth",
+      "callee_endpoint": "GET /.well-known/jwks.json",
+      "type": "rest",
+      "pattern": [
+        "env-var-config"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "promotion.db:promotion.7e74a0",
+      "caller": "promotion",
+      "caller_endpoint": "GET /promotions/eligible",
+      "callee": "db:promotion",
+      "callee_endpoint": "promotions",
+      "type": "query",
+      "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "promotion.restaurant.7454b7",
+      "caller": "promotion",
+      "caller_endpoint": "GET /promotions/eligible",
+      "callee": "restaurant",
+      "callee_endpoint": "GET /restaurants/{id}",
+      "type": "rest",
+      "pattern": [
+        "env-var-config",
+        "string-concatenation"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "promotion.restaurant.c8e50f",
+      "caller": "promotion",
+      "caller_endpoint": "GET /promotions/eligible",
+      "callee": "restaurant",
+      "callee_endpoint": "GET /restaurants/{id}/addresses",
+      "type": "rest",
+      "pattern": [
+        "env-var-config",
+        "string-concatenation"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "promotion.user.31e466",
+      "caller": "promotion",
+      "caller_endpoint": "GET /promotions/eligible",
+      "callee": "user",
+      "callee_endpoint": "GET /users/{id}/addresses",
+      "type": "rest",
+      "pattern": [
+        "env-var-config",
+        "string-concatenation"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
       "id": "restaurant.address.52190b",
       "caller": "restaurant",
       "caller_endpoint": "DELETE /restaurants/{id}",
@@ -2207,153 +2572,6 @@
       "pattern": [
         "client-wrapper",
         "literal-url"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "promotion",
-      "caller_endpoint": "GET /promotions/eligible",
-      "callee": "restaurant",
-      "callee_endpoint": "GET /restaurants/{id}",
-      "type": "rest",
-      "pattern": [
-        "env-var-config",
-        "string-concatenation"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "promotion",
-      "caller_endpoint": "GET /promotions/eligible",
-      "callee": "restaurant",
-      "callee_endpoint": "GET /restaurants/{id}/addresses",
-      "type": "rest",
-      "pattern": [
-        "env-var-config",
-        "string-concatenation"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "promotion",
-      "caller_endpoint": "GET /promotions/eligible",
-      "callee": "user",
-      "callee_endpoint": "GET /users/{id}/addresses",
-      "type": "rest",
-      "pattern": [
-        "env-var-config",
-        "string-concatenation"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "promotion",
-      "caller_endpoint": null,
-      "callee": "auth",
-      "callee_endpoint": "GET /.well-known/jwks.json",
-      "type": "rest",
-      "pattern": [
-        "env-var-config"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "promotion",
-      "caller_endpoint": "GET /promotions/eligible",
-      "callee": "db:promotion",
-      "callee_endpoint": "promotions",
-      "type": "query",
-      "pattern": null,
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "pricing",
-      "caller_endpoint": "POST /price",
-      "callee": "menu",
-      "callee_endpoint": "GET /items",
-      "type": "rest",
-      "pattern": [
-        "env-var-config",
-        "string-concatenation"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "pricing",
-      "caller_endpoint": "POST /price",
-      "callee": "promotion",
-      "callee_endpoint": "GET /promotions/eligible",
-      "type": "rest",
-      "pattern": [
-        "env-var-config",
-        "string-concatenation"
-      ],
-      "routing_key": null,
-      "headers": null,
-      "selector": null,
-      "role": null,
-      "derived_from": null,
-      "static": true,
-      "observed": false
-    },
-    {
-      "id": "",
-      "caller": "pricing",
-      "caller_endpoint": null,
-      "callee": "auth",
-      "callee_endpoint": "GET /.well-known/jwks.json",
-      "type": "rest",
-      "pattern": [
-        "env-var-config"
       ],
       "routing_key": null,
       "headers": null,
