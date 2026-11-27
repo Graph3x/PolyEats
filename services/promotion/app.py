@@ -63,7 +63,9 @@ def eligible():
     restaurant = f"{RESTAURANT_URL}/restaurants/{restaurant_id}"
     cuisine = fetch(restaurant, caller)["cuisine"]
     restaurant_cities = cities(fetch(f"{restaurant}/addresses", caller))
-    customer_cities = cities(fetch(f"{USER_URL}/users/{caller.subject}/addresses", caller))
+    customer_cities = cities(
+        fetch(f"{USER_URL}/users/{caller.subject}/addresses", caller)
+    )
 
     with connect() as connection:
         return connection.execute(
