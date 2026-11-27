@@ -211,6 +211,59 @@ def review():
     call("DELETE", f"{restaurants}/{customer_id}", token=token)
 
 
+def cart():
+    tokens = login()
+    if not tokens:
+        return
+    token = tokens["access_token"]
+
+    users = f"{GATEWAY}/user/users"
+    restaurants = f"{GATEWAY}/restaurant/restaurants"
+    addresses = f"{GATEWAY}/address/addresses"
+    items = f"{GATEWAY}/menu/items"
+    mine = f"{GATEWAY}/cart/carts/{customer_id}"
+    dish = {"restaurantId": customer_id, "name": "Svickova", "price": 18900}
+
+    call("POST", restaurants, {"name": "Bistro", "cuisine": "czech"}, token=token)
+    located = SEED_ADDRESS | {"ownerType": "restaurant", "ownerId": customer_id}
+    call("POST", addresses, located, token=token)
+    available = call("POST", items, dish, token=token)
+    sold_out = call("POST", items, dish | {"available": False}, token=token)
+    if not available or not sold_out:
+        return
+    line = f"{mine}/items/{available['id']}"
+
+    call("PUT", line, {"quantity": 2}, token=token)
+    call("GET", mine, expect=422, token=token)
+
+    call("POST", users, {"name": "Customer", "email": CUSTOMER["email"]}, token=token)
+    call("POST", addresses, SEED_ADDRESS | {"ownerId": customer_id}, token=token)
+
+    call("PUT", line, {"quantity": 0}, expect=400, token=token)
+    unavailable = f"{mine}/items/{sold_out['id']}"
+    call("PUT", unavailable, {"quantity": 1}, expect=409, token=token)
+    call("PUT", f"{mine}/items/unknown", {"quantity": 1}, expect=422, token=token)
+    call(
+        "PUT",
+        f"{GATEWAY}/cart/carts/acc-other/items/{available['id']}",
+        {"quantity": 1},
+        expect=403,
+        token=token,
+    )
+
+    # 2 x 18900 with NEIGHBOUR20, the best of the four promotions that match.
+    priced = call("GET", mine, token=token)
+    if priced and priced["total"] != 30240:
+        failures.append(f"GET {mine} total {priced['total']} (want 30240)")
+
+    call("DELETE", line, token=token)
+    call("DELETE", mine, token=token)
+    call("GET", mine, token=token)
+
+    call("DELETE", f"{users}/{customer_id}", token=token)
+    call("DELETE", f"{restaurants}/{customer_id}", token=token)
+
+
 def gateway():
     call("GET", f"{GATEWAY}/health")
 
@@ -272,6 +325,7 @@ SERVICES = [
     menu,
     courier_profile,
     review,
+    cart,
     gateway,
     account,
 ]
