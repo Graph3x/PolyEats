@@ -1,4 +1,4 @@
-# PolyEats - dataset schema version 1.2.0
+# PolyEats - dataset schema version 1.2.1
 
 Specification for the published dataset: file layout, node/edge schema, enums, and serialization rules.
 
