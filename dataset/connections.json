@@ -247,6 +247,17 @@
       "native_name": null,
       "routing": null,
       "delivery": null
+    },
+    {
+      "id": "pricing",
+      "kind": "service",
+      "language": "python",
+      "stack": "flask",
+      "broker": null,
+      "native_kind": null,
+      "native_name": null,
+      "routing": null,
+      "delivery": null
     }
   ],
   "edges": [
@@ -2288,6 +2299,62 @@
       "callee_endpoint": "promotions",
       "type": "query",
       "pattern": null,
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "pricing",
+      "caller_endpoint": "POST /price",
+      "callee": "menu",
+      "callee_endpoint": "GET /items",
+      "type": "rest",
+      "pattern": [
+        "env-var-config",
+        "string-concatenation"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "pricing",
+      "caller_endpoint": "POST /price",
+      "callee": "promotion",
+      "callee_endpoint": "GET /promotions/eligible",
+      "type": "rest",
+      "pattern": [
+        "env-var-config",
+        "string-concatenation"
+      ],
+      "routing_key": null,
+      "headers": null,
+      "selector": null,
+      "role": null,
+      "derived_from": null,
+      "static": true,
+      "observed": false
+    },
+    {
+      "id": "",
+      "caller": "pricing",
+      "caller_endpoint": null,
+      "callee": "auth",
+      "callee_endpoint": "GET /.well-known/jwks.json",
+      "type": "rest",
+      "pattern": [
+        "env-var-config"
+      ],
       "routing_key": null,
       "headers": null,
       "selector": null,

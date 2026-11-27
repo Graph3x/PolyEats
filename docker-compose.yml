@@ -267,3 +267,14 @@ services:
     healthcheck: *healthcheck
     networks:
       - polyeats
+
+  pricing:
+    build: ./services/pricing
+    environment:
+      <<: [*otel, *jwks]
+      OTEL_SERVICE_NAME: pricing
+      MENU_URL: http://menu:8080
+      PROMOTION_URL: http://promotion:8080
+    healthcheck: *healthcheck
+    networks:
+      - polyeats
